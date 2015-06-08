@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -25,6 +26,7 @@ public class MainWindow
 	
 	public MainWindow()
 	{
+		initializeDominoes();
 		initializeWindow();
 	}
 	
@@ -32,8 +34,6 @@ public class MainWindow
 	{
 		JFrame frame = new JFrame("TestFenster");
 		Container contentPane = frame.getContentPane();
-		
-		initializeDominoes();
 		
 		BufferedImage img = null;
 		BufferedImage imgTP = null;
@@ -46,13 +46,13 @@ public class MainWindow
 		
 		try {
 			img = ImageIO.read(new File("ImageSrc/SteinTest.jpg"));
-			imgTP = ImageIO.read(new File("ImageSrc/transparenzTest3.png"));
+			imgTP = ImageIO.read(new File("ImageSrc/transparenzTest5.png"));
 			imgTP2 = ImageIO.read(new File("ImageSrc/transparenzTest2.png"));
 			
 			BufferedImage steinIcon = allStones[15].getIcon();
 			
 			iIcon1.setImage(img.getScaledInstance(50, 100, Image.SCALE_DEFAULT));
-			iIcon2.setImage(imgTP.getScaledInstance(75, 150, Image.SCALE_DEFAULT));
+			iIcon2.setImage(imgTP.getScaledInstance(150, 75, Image.SCALE_DEFAULT));
 			//iIcon3.setImage(imgTP2.getScaledInstance(36, 75, Image.SCALE_DEFAULT));
 			iIcon4.setImage(steinIcon.getScaledInstance(75, 150, Image.SCALE_DEFAULT));
 			
@@ -79,9 +79,9 @@ public class MainWindow
 			paint.setSize(new Dimension(800, 600));
 			
 			prepareRender(allStones[0].getIcon(), 0, new Dimension(x+w+1, (int) (y+0.75*h)), new Dimension(w, h));
-			prepareRender(allStones[1].getIcon(), 0, new Dimension((int) (x+2*w+1), (int) (y+0.75*h)), new Dimension(w, h));
-			prepareRender(allStones[2].getIcon(), 0, new Dimension((int) (x+3*w+1), (int) (y+0.75*h)), new Dimension(w, h));
-			prepareRender(allStones[3].getIcon(), 0, new Dimension((int) (x+4*w+1), (int) (y+0.75*h)), new Dimension(w, h));
+			prepareRender(imgTP, 0, new Dimension((int) (x+2*w+1), (int) (y+h)), new Dimension(h, w));
+			prepareRender(allStones[2].getIcon(), 0, new Dimension((int) (x+4*w+1), (int) (y+0.75*h)), new Dimension(w, h));
+			prepareRender(allStones[3].getIcon(), 0, new Dimension((int) (x+5*w+1), (int) (y+0.75*h)), new Dimension(w, h));
 			
 			/*
 			paint.setImage(steinIcon);
@@ -99,7 +99,7 @@ public class MainWindow
 			e.printStackTrace();
 		}
 		
-		contentPane.setBackground(Color.GRAY);
+		contentPane.setBackground(Color.LIGHT_GRAY);
 		contentPane.setVisible(true);
 		contentPane.setSize(1000, 1000);
 		contentPane.setLayout(null);
@@ -110,11 +110,7 @@ public class MainWindow
 	
 	private void prepareRender(BufferedImage img, double degrees, Dimension pos, Dimension size)
 	{
-		RenderImage next = new RenderImage();
-		next.setImg(img);
-		next.setDegrees(degrees);
-		next.setPos(pos);
-		next.setSize(size);
+		RenderImage next = new RenderImage(img, degrees, pos, size);
 		
 		renderedImages.add(next);
 	}
@@ -145,17 +141,34 @@ public class MainWindow
 		{
 			System.out.println(n.getPips1() + "|" + n.getPips2() + " = " + n.getValue() + " | DS: " + n.isDoublestone());
 		}
+		
+		ArrayList<Stone> stoneShuffler = new ArrayList<Stone>();
+		
+		for(Stone s : allStones)
+		{
+			stoneShuffler.add(s);
+		}
+		
+		Collections.shuffle(stoneShuffler);
+		int z = 0;
+		
+		for (Stone s : stoneShuffler)
+		{
+			allStones[z] = s;
+			z++;
+		}
+		
+		System.out.println("Gemischt!:");
+		
+		for (Stone n : allStones)
+		{
+			System.out.println(n.getPips1() + "|" + n.getPips2() + " = " + n.getValue() + " | DS: " + n.isDoublestone());
+		}
 	}
 
 	class PaintingComponent extends JComponent
 	{
 		private static final long serialVersionUID = 1L;
-		private BufferedImage img;
-		private double degrees;
-		private double posX;
-		private double posY;
-		private int sizeX;
-		private int sizeY;
 		
 		/**
 		 * Darf nicht vom Programmierer aufgerufen werden! Java ruft diese Methode bei bedarf selbst auf.
@@ -198,52 +211,6 @@ public class MainWindow
 			}
 			
 			g2d.dispose();
-		}
-		
-		/**
-		 * Das Bild angeben
-		 * @param img - Das Bild
-		 */
-		public void setImage (BufferedImage img)
-		{
-			this.img = img;
-		}
-		
-		/**
-		 * Den Winkel bestimmen, um den das Bild gedreht werden soll
-		 * @param degrees - Der Winkel in Grad
-		 */
-		public void setDegrees (double degrees)
-		{
-			this.degrees = degrees;
-		}
-		
-		/**
-		 * Die neue X-Koordinate, an der das Bild gezeichnet werden soll
-		 * @param posX - Die X-Koordinate
-		 */
-		public void setPosX (double posX)
-		{
-			this.posX = posX;
-		}
-		
-		/**
-		 * Die neue Y-Koordinate, an der das Bild gezeichnet werden soll
-		 * @param posY - Die Y-Koordinate
-		 */
-		public void setPosY (double posY)
-		{
-			this.posY = posY;
-		}
-		
-		/**
-		 * Die Größe des zu zeichnenden Bildes festlegen
-		 * @param sizeX - Die Breite
-		 */
-		public void setImageSize (int width, int height)
-		{
-			this.sizeX = width;
-			this.sizeY = height;
 		}
 	}
 }

@@ -8,14 +8,17 @@ public class RenderImage
 	private Dimension pos;
 	private Dimension size;
 	
+	public RenderImage(BufferedImage img, double degrees, Dimension pos, Dimension size)
+	{
+		this.img = img;
+		this.degrees = degrees;
+		this.pos = pos;
+		this.size = size;
+	}
+	
 	public BufferedImage getImg()
 	{
 		return img;
-	}
-	
-	public void setImg(BufferedImage img)
-	{
-		this.img = img;
 	}
 	
 	public double getDegrees()
@@ -23,28 +26,13 @@ public class RenderImage
 		return degrees;
 	}
 	
-	public void setDegrees(double degrees)
-	{
-		this.degrees = degrees;
-	}
-	
 	public Dimension getPos()
 	{
 		return pos;
 	}
 	
-	public void setPos(Dimension pos)
-	{
-		this.pos = pos;
-	}
-	
 	public Dimension getSize()
 	{
 		return size;
-	}
-	
-	public void setSize(Dimension size)
-	{
-		this.size = size;
 	}
 }

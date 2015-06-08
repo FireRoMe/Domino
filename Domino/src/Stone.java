@@ -12,15 +12,14 @@ public class Stone
 	private int pips1 = 36;
 	private int pips2 = 36;
 	private int value;
-	private boolean edge_left;
-	private boolean edge_right;
-	private boolean edge_top;
-	private boolean edge_bottom;
 	private boolean doublestone;
 	private boolean spinner;
+	private boolean vertical;
 	private BufferedImage icon;
 	private Stone leftNeighbour;
 	private Stone rightNeighbour;
+	private Stone topNeighbour;
+	private Stone bottomNeighbour;
 	private Dimension position;
 	
 	public Stone()
