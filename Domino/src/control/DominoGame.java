@@ -30,6 +30,7 @@ public class DominoGame
 		initializeDominoes();
 		initializePlayers();
 		initializeHands();
+		initializeTalon();
 		view.initializeWindow(allStones);
 		
 	}
@@ -118,6 +119,8 @@ public class DominoGame
 		
 		for (Player p: allPlayers)
 		{
+			view.textOut("");
+			
 			for (int i = 0; i < numStones; i++)
 			{
 				int pos = playerID + (numPlayers*i);
@@ -127,9 +130,23 @@ public class DominoGame
 				
 				view.textOut(p.getName() + " Stein " + (i+1) + ": " + allStones[pos].getPips1() + "|" + allStones[pos].getPips2());
 			}
-			
-			view.textOut("");
 			playerID++;
+		}
+	}
+	
+	private void initializeTalon()
+	{
+		for (Stone s: allStones)
+		{
+			if (s.getPlayer() == null)
+				talon.add(s);
+		}
+		
+		view.textOut("");
+		
+		for (Stone s: talon)
+		{
+			view.textOut("Talon " + (talon.indexOf(s)+1) + ": " + s.getPips1() + "|" + s.getPips2());
 		}
 	}
 }

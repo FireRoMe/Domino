@@ -43,4 +43,9 @@ public class Player
 	{
 		return points;
 	}
+	
+	public Stone placeStone(Stone s)
+	{
+		return s;
+	}
 }

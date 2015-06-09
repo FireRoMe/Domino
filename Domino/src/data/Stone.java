@@ -38,7 +38,8 @@ public class Stone
 		BufferedImage image;
 		
 		//String fileName = new String("ImageSrc/transparenzTest" + pips1 + "_" + pips2 + ".png");
-		String fileName = new String("ImageSrc/transparenzTest" + 2 + "_" + 4 + "_new" + ".png");
+		//String fileName = new String("ImageSrc/transparenzTest" + 2 + "_" + 4 + "_new" + ".png");
+		String fileName = new String("ImageSrc/transparenzTest4.png");
 		System.out.println("Dateiname: " + fileName);
 		try {
 			//if (pips1 == 2 && pips2 == 4)		// TODO passendes Bild raussuchen

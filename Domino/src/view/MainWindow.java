@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -23,7 +22,7 @@ import data.Stone;
 
 public class MainWindow
 {
-	private PaintingComponent paint = new PaintingComponent();
+	private PaintingComponent paintingComponent = new PaintingComponent();
 	private ArrayList<RenderImage> renderedImages = new ArrayList<RenderImage>();
 	
 	public void initializeWindow(Stone[] allStones)
@@ -42,7 +41,7 @@ public class MainWindow
 		
 		try {
 			img = ImageIO.read(new File("ImageSrc/SteinTest.jpg"));
-			imgTP = ImageIO.read(new File("ImageSrc/transparenzTest5.png"));
+			imgTP = ImageIO.read(new File("ImageSrc/transparenzTest4.png"));
 			imgTP2 = ImageIO.read(new File("ImageSrc/transparenzTest2.png"));
 			
 			BufferedImage steinIcon = allStones[15].getIcon();
@@ -56,7 +55,7 @@ public class MainWindow
 			JLabel imageLabel2 = new JLabel(iIcon2);
 			JLabel imageLabel3 = new JLabel(iIcon4);
 			
-			contentPane.add(paint);
+			contentPane.add(paintingComponent);
 			contentPane.add(imageLabel);
 			//contentPane.add(imageLabel2);
 			//contentPane.add(imageLabel3);
@@ -72,10 +71,10 @@ public class MainWindow
 			imageLabel2.setBounds(x+w+1, y, w, h);
 			imageLabel3.setBounds(x+2*(w+1), y, w, h);
 			
-			paint.setSize(new Dimension(800, 600));
+			paintingComponent.setSize(new Dimension(800, 600));
 			
 			prepareRender(allStones[0].getIcon(), 0, new Dimension(x+w+1, (int) (y+0.75*h)), new Dimension(w, h));
-			prepareRender(imgTP, 0, new Dimension((int) (x+2*w+1), (int) (y+h)), new Dimension(h, w));
+			prepareRender(imgTP, 0, new Dimension((int) (x+2*w-3), (int) (y+h)), new Dimension(h, w));
 			prepareRender(allStones[2].getIcon(), 0, new Dimension((int) (x+4*w+1), (int) (y+0.75*h)), new Dimension(w, h));
 			prepareRender(allStones[3].getIcon(), 0, new Dimension((int) (x+5*w+1), (int) (y+0.75*h)), new Dimension(w, h));
 			
@@ -140,17 +139,37 @@ public class MainWindow
 			*/
 			AffineTransform[] at = new AffineTransform[renderedImages.size()];
 			Image[] images = new Image[renderedImages.size()];
+			Rectangle[] rects = new Rectangle[renderedImages.size()];
 			Graphics2D g2d = (Graphics2D) g;
 			int i = 0;
 			
 			for (RenderImage ri: renderedImages)
 			{
-				at[i] = AffineTransform.getTranslateInstance(ri.getPos().getWidth(), ri.getPos().getHeight());
+				double x = ri.getPos().getWidth();
+				double y = ri.getPos().getHeight();
+				double w = ri.getSize().getWidth();
+				double h = ri.getSize().getHeight();
+				
+				at[i] = AffineTransform.getTranslateInstance(x, y);
 				at[i].rotate(Math.toRadians(ri.getDegrees()));
 				
-				images[i] = ri.getImg().getScaledInstance(ri.getSize().width, ri.getSize().height, Image.SCALE_SMOOTH);
+				images[i] = ri.getImg().getScaledInstance((int) w, (int) h, Image.SCALE_SMOOTH);
+				rects[i] = new Rectangle();
+				rects[i].setRect(x, y, w, h);
 				
+				g2d.setColor(Color.GREEN);
+				g2d.draw(rects[i]);
+				g2d.setColor(Color.BLACK);
 				g2d.drawImage(images[i], at[i], null);
+				
+				if (i >= 1)
+				{
+					if (rects[i].intersects(rects[i-1]))
+					{
+						g2d.setColor(Color.RED);
+						g2d.draw(rects[i].intersection(rects[i-1]));
+					}
+				}
 				
 				i++;
 			}
