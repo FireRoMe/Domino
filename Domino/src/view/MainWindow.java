@@ -1,3 +1,4 @@
+package view;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -18,19 +19,14 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import data.Stone;
+
 public class MainWindow
 {
 	private PaintingComponent paint = new PaintingComponent();
-	private Stone[] allStones = new Stone[28];
 	private ArrayList<RenderImage> renderedImages = new ArrayList<RenderImage>();
 	
-	public MainWindow()
-	{
-		initializeDominoes();
-		initializeWindow();
-	}
-	
-	public void initializeWindow()
+	public void initializeWindow(Stone[] allStones)
 	{
 		JFrame frame = new JFrame("TestFenster");
 		Container contentPane = frame.getContentPane();
@@ -114,57 +110,6 @@ public class MainWindow
 		
 		renderedImages.add(next);
 	}
-	
-	private void initializeDominoes()
-	{
-		int x = 0;
-		int y = 0;
-		int current = 0;
-		
-		for (x = 0; x <= 6; x++)
-		{
-			for (y = 0; y <= 6; y++)
-			{
-				if (y == 0)
-					y = x;
-				
-				allStones[current] = new Stone();
-				allStones[current].setPips1(x);
-				allStones[current].setPips2(y);
-				allStones[current].loadIcon();
-				
-				current++;
-			}
-		}
-		
-		for (Stone n : allStones)
-		{
-			System.out.println(n.getPips1() + "|" + n.getPips2() + " = " + n.getValue() + " | DS: " + n.isDoublestone());
-		}
-		
-		ArrayList<Stone> stoneShuffler = new ArrayList<Stone>();
-		
-		for(Stone s : allStones)
-		{
-			stoneShuffler.add(s);
-		}
-		
-		Collections.shuffle(stoneShuffler);
-		int z = 0;
-		
-		for (Stone s : stoneShuffler)
-		{
-			allStones[z] = s;
-			z++;
-		}
-		
-		System.out.println("Gemischt!:");
-		
-		for (Stone n : allStones)
-		{
-			System.out.println(n.getPips1() + "|" + n.getPips2() + " = " + n.getValue() + " | DS: " + n.isDoublestone());
-		}
-	}
 
 	class PaintingComponent extends JComponent
 	{
@@ -212,5 +157,10 @@ public class MainWindow
 			
 			g2d.dispose();
 		}
+	}
+	
+	public void textOut(String s)
+	{
+		System.out.println(s);
 	}
 }

@@ -1,3 +1,4 @@
+package data;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -21,9 +22,15 @@ public class Stone
 	private Stone topNeighbour;
 	private Stone bottomNeighbour;
 	private Dimension position;
+	private Player player;
 	
-	public Stone()
+	public Stone(int pips1, int pips2)
 	{
+		this.pips1 = pips1;
+		this.pips2 = pips2;
+		
+		calculateValue();
+		setDoublestone();
 	}
 
 	public void loadIcon()
@@ -31,7 +38,7 @@ public class Stone
 		BufferedImage image;
 		
 		//String fileName = new String("ImageSrc/transparenzTest" + pips1 + "_" + pips2 + ".png");
-		String fileName = new String("ImageSrc/transparenzTest" + 2 + "_" + 4 + ".png");
+		String fileName = new String("ImageSrc/transparenzTest" + 2 + "_" + 4 + "_new" + ".png");
 		System.out.println("Dateiname: " + fileName);
 		try {
 			//if (pips1 == 2 && pips2 == 4)		// TODO passendes Bild raussuchen
@@ -51,23 +58,9 @@ public class Stone
 		return pips1;
 	}
 	
-	public void setPips1(int augenzahl1)
-	{
-		this.pips1 = augenzahl1;
-	}
-	
 	public int getPips2()
 	{
 		return pips2;
-	}
-	
-	public void setPips2(int augenzahl2)
-	{
-		this.pips2 = augenzahl2;
-		
-		if (pips1 != 36)
-			calculateValue();
-			setDoublestone();
 	}
 
 	public int getValue()
@@ -94,5 +87,16 @@ public class Stone
 	public BufferedImage getIcon()
 	{
 		return icon;
+	}
+	
+	public void setPlayer(Player p)
+	{
+		if (p != null)
+			this.player = p;
+	}
+	
+	public Player getPlayer()
+	{
+		return player;
 	}
 }
