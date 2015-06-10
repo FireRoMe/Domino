@@ -79,12 +79,17 @@ public class MainWindow
 			imageLabel.addMouseListener(mouseHandler);
 			
 			DominoLabel d1 = new DominoLabel(allStones[1]);
+			DominoLabel d2 = new DominoLabel(allStones[2]);
 			
 			d1.setLocation(contentPane.getWidth()/2 - d1.getWidth()/2, contentPane.getHeight()/2 - d1.getHeight()/2);
 			d1.addMouseListener(mouseHandler);
 			d1.addMouseMotionListener(mouseHandler);
+			d2.setLocation(contentPane.getWidth()/2 - d1.getWidth(), contentPane.getHeight()/2 + d1.getHeight()/2 +5);
+			d2.addMouseListener(mouseHandler);
+			d2.addMouseMotionListener(mouseHandler);
 			
 			contentPane.add(d1);
+			contentPane.add(d2);
 			contentPane.add(paintingComponent);
 			contentPane.add(imageLabel);
 			//contentPane.add(imageLabel3);
