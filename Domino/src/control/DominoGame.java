@@ -42,6 +42,7 @@ public class DominoGame
 		initializeHands();
 		initializeTalon();
 		view.initializeWindow(allStones, new MouseClickMotionListener());
+		view.textOut(chooseBeginner().getName());
 		
 	}
 
@@ -104,6 +105,38 @@ public class DominoGame
 			allStones[z] = s;
 			z++;
 		}
+	}
+	
+	public Player chooseBeginner()
+	{
+		
+		Stone highest = null;
+		
+		for (Player p: allPlayers)
+		{
+			for (Stone s: p.getHand())
+			{
+				if (s.isDoublestone() == true)
+				{
+					
+						if (highest != null)
+						{
+							
+							if (s.getValue() > highest.getValue())
+							{
+								
+								highest = s;
+							
+							}
+							
+						}
+						else
+							highest = s;
+				}
+			}
+		}
+		
+		return highest.getPlayer();
 	}
 	
 	/**
