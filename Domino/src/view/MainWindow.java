@@ -30,6 +30,7 @@ public class MainWindow
 	private MouseClickMotionListener mouseHandler;
 	private JLabel lbl_mouseX = new JLabel();
 	private JLabel lbl_mouseY = new JLabel();
+	private DominoLabel[] dLabels = new DominoLabel[28];
 	
 	public void initializeWindow(Stone[] allStones, MouseClickMotionListener mouseHandler)
 	{
@@ -78,18 +79,23 @@ public class MainWindow
 			
 			imageLabel.addMouseListener(mouseHandler);
 			
-			DominoLabel d1 = new DominoLabel(allStones[1]);
-			DominoLabel d2 = new DominoLabel(allStones[2]);
+			dLabels[0] = new DominoLabel(allStones[0]);
+			dLabels[1] = new DominoLabel(allStones[1]);
+			dLabels[2] = new DominoLabel(allStones[2]);
 			
-			d1.setLocation(contentPane.getWidth()/2 - d1.getWidth()/2, contentPane.getHeight()/2 - d1.getHeight()/2);
-			d1.addMouseListener(mouseHandler);
-			d1.addMouseMotionListener(mouseHandler);
-			d2.setLocation(contentPane.getWidth()/2 - d1.getWidth(), contentPane.getHeight()/2 + d1.getHeight()/2 +5);
-			d2.addMouseListener(mouseHandler);
-			d2.addMouseMotionListener(mouseHandler);
+			dLabels[0].setLocation(contentPane.getWidth()/2 - dLabels[0].getWidth()/2, contentPane.getHeight()/2 - dLabels[0].getHeight()/2);
+			dLabels[0].addMouseListener(mouseHandler);
+			dLabels[0].addMouseMotionListener(mouseHandler);
+			dLabels[1].setLocation(contentPane.getWidth()/2 - dLabels[0].getWidth(), contentPane.getHeight()/2 + dLabels[0].getHeight()/2 +5);
+			dLabels[1].addMouseListener(mouseHandler);
+			dLabels[1].addMouseMotionListener(mouseHandler);
+			dLabels[2].setLocation((int) (contentPane.getWidth()/2 - dLabels[0].getWidth()*1.5), contentPane.getHeight()/2 + dLabels[1].getHeight()*2);
+			dLabels[2].addMouseListener(mouseHandler);
+			dLabels[2].addMouseMotionListener(mouseHandler);
 			
-			contentPane.add(d1);
-			contentPane.add(d2);
+			contentPane.add(dLabels[0]);
+			contentPane.add(dLabels[1]);
+			contentPane.add(dLabels[2]);
 			contentPane.add(paintingComponent);
 			contentPane.add(imageLabel);
 			//contentPane.add(imageLabel3);
@@ -108,7 +114,7 @@ public class MainWindow
 			paintingComponent.setSize(new Dimension(800, 600));
 			
 			prepareRender(allStones[0].getIcon(), 0, new Dimension(x+w, (int) (y+0.75*h)), new Dimension(w, h));
-			prepareRender(allStones[1].getIcon(), 0, new Dimension((int) (x+2*w+1), (int) (y+0.75*h)), new Dimension(w, h));
+			prepareRender(allStones[1].getIcon(), 0, new Dimension((int) (x+2*w-5), (int) (y+0.75*h + 10)), new Dimension(w, h));
 			prepareRender(allStones[2].getIcon(), 0, new Dimension((int) (x+3*w+2), (int) (y+0.75*h)), new Dimension(w, h));
 			prepareRender(allStones[3].getIcon(), 0, new Dimension((int) (x+4*w+3), (int) (y+0.75*h)), new Dimension(w, h));
 			
@@ -144,6 +150,7 @@ public class MainWindow
 	class PaintingComponent extends JComponent
 	{
 		private static final long serialVersionUID = 1L;
+		private Shape shape;
 		
 		/**
 		 * Darf nicht vom Programmierer aufgerufen werden! Java ruft diese Methode bei bedarf selbst auf.
@@ -211,7 +218,19 @@ public class MainWindow
 				i++;
 			}
 			
+			if (shape != null)
+			{
+				g2d.setColor(Color.RED);
+				g2d.draw(shape);
+			}
+			
 			g2d.dispose();
+		}
+		
+		public void setShape (Shape s)
+		{
+			if (s != null)
+				this.shape = s;
 		}
 	}
 	
@@ -228,13 +247,27 @@ public class MainWindow
 		lbl_mouseX.setSize(lbl_mouseX.getText().length() * 6, 20);
 		lbl_mouseY.setSize(lbl_mouseY.getText().length() * 6, 20);
 	}
+	
+	public void checkIntersection()
+	{
+		for (int i = 0; i < dLabels.length; i++)
+		{
+			if (dLabels[i] == null || dLabels[i+1] == null)
+				break;
+			else
+			{
+				for (int j = i+1; j < dLabels.length; j++) 
+				{
+					if (dLabels[i].getBounds().intersects(dLabels[j].getBounds()))
+					{
+						paintingComponent.setShape(dLabels[i].getBounds().intersection(dLabels[j].getBounds()));
+						paintingComponent.repaint();
+					}
+					
+					if (dLabels[j+1] == null)
+						break;
+				}
+			}
+		}
+	}
 }
-/*
-Rectangle r = new Rectangle(x, y, width, height);
-Path2D.Double path = new Path2D.Double();
-path.append(r, false);
-AffineTransform t = new AffineTransform();
-t.rotate(angle);
-path.transform(t);
-g2.draw(path);
-*/

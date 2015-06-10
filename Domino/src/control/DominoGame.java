@@ -109,7 +109,6 @@ public class DominoGame
 	
 	public Player chooseBeginner()
 	{
-		
 		Stone highest = null;
 		
 		for (Player p: allPlayers)
@@ -118,20 +117,25 @@ public class DominoGame
 			{
 				if (s.isDoublestone() == true)
 				{
-					
 						if (highest != null)
 						{
-							
 							if (s.getValue() > highest.getValue())
-							{
-								
 								highest = s;
-							
-							}
-							
 						}
 						else
 							highest = s;
+				}
+			}
+		}
+		
+		if (highest == null)
+		{
+			for (Player p: allPlayers)
+			{
+				for (Stone s: p.getHand())
+				{
+					if (s.getValue() > highest.getValue())
+						highest = s;
 				}
 			}
 		}
@@ -213,6 +217,9 @@ public class DominoGame
 				int offsetY = d.getTopLevelAncestor().getY() + d.getHeight();
 				
 				d.setLocation(mousePos.getLocation().x - offsetX, mousePos.getLocation().y - offsetY);
+				
+				view.checkIntersection();
+				
 				view.textOut("Autoscroll:" + d.getAutoscrolls());
 			}
 			
