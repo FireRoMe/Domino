@@ -1,8 +1,18 @@
 package control;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.swing.JLabel;
+
+import view.DominoLabel;
 import view.MainWindow;
 import data.Player;
 import data.Stone;
@@ -31,7 +41,7 @@ public class DominoGame
 		initializePlayers();
 		initializeHands();
 		initializeTalon();
-		view.initializeWindow(allStones);
+		view.initializeWindow(allStones, new MouseClickMotionListener());
 		
 	}
 
@@ -39,6 +49,8 @@ public class DominoGame
 	{
 		int x = 0;
 		int y = 0;
+		int w = 100;
+		int h= 50;
 		int current = 0;
 		
 		for (x = 0; x <= 6; x++)
@@ -48,7 +60,7 @@ public class DominoGame
 				if (y == 0)
 					y = x;
 				
-				allStones[current] = new Stone(x, y);
+				allStones[current] = new Stone(x, y, new Dimension(w, h));
 				allStones[current].loadIcon();
 				
 				current++;
@@ -148,5 +160,79 @@ public class DominoGame
 		{
 			view.textOut("Talon " + (talon.indexOf(s)+1) + ": " + s.getPips1() + "|" + s.getPips2());
 		}
+	}
+	
+	public class MouseClickMotionListener implements MouseListener, MouseMotionListener
+	{
+		private PointerInfo mousePos;
+		
+		@Override
+		public void mouseDragged(MouseEvent e)
+		{
+			mousePos = MouseInfo.getPointerInfo();
+			view.showMousePosition(mousePos.getLocation().x, mousePos.getLocation().y);
+			
+			if (e.getSource() instanceof DominoLabel)
+			{
+				view.textOut("Ich bin im MouseDragged");
+				DominoLabel d = (DominoLabel) e.getSource();
+				int offsetX = d.getTopLevelAncestor().getX() + d.getWidth()/2;
+				int offsetY = d.getTopLevelAncestor().getY() + d.getHeight();
+				
+				d.setLocation(mousePos.getLocation().x - offsetX, mousePos.getLocation().y - offsetY);
+				view.textOut("Autoscroll:" + d.getAutoscrolls());
+			}
+			
+			
+			e.consume();
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e)
+		{
+			mousePos = MouseInfo.getPointerInfo();
+			view.showMousePosition(mousePos.getLocation().x, mousePos.getLocation().y);
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e)
+		{
+			view.textOut("Geklickt!");
+			
+			Object c = e.getSource();
+			
+			if (c instanceof JLabel)
+				view.textOut("Yeah, ich habe auf ein JLabel geklickt!");
+			
+			if (c instanceof DominoLabel)
+				System.err.println("Yeah, ich habe auf ein DominoLabel geklickt!");
+			
+			e.consume();			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e)
+		{
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e)
+		{
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e)
+		{
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e)
+		{
+			// TODO Auto-generated method stub
+		}
+		
 	}
 }

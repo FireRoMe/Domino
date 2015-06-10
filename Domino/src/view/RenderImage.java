@@ -1,15 +1,16 @@
 package view;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 public class RenderImage
 {
-	private BufferedImage img;
+	private Image img;
 	private double degrees;
 	private Dimension pos;
 	private Dimension size;
 	
-	public RenderImage(BufferedImage img, double degrees, Dimension pos, Dimension size)
+	public RenderImage(Image img, double degrees, Dimension pos, Dimension size)
 	{
 		this.img = img;
 		this.degrees = degrees;
@@ -17,7 +18,7 @@ public class RenderImage
 		this.size = size;
 	}
 	
-	public BufferedImage getImg()
+	public Image getImg()
 	{
 		return img;
 	}
