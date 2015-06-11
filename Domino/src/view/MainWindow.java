@@ -150,7 +150,7 @@ public class MainWindow
 	class PaintingComponent extends JComponent
 	{
 		private static final long serialVersionUID = 1L;
-		private Shape shape;
+		private Object[] intersections;
 		
 		/**
 		 * Darf nicht vom Programmierer aufgerufen werden! Java ruft diese Methode bei bedarf selbst auf.
@@ -218,19 +218,23 @@ public class MainWindow
 				i++;
 			}
 			
-			if (shape != null)
+			if (intersections != null)
 			{
-				g2d.setColor(Color.RED);
-				g2d.draw(shape);
+				System.out.println("Intersections: " + intersections.length);
+				for (Object s: intersections)
+				{
+					g2d.setColor(Color.RED);
+					g2d.fill((Shape)s);
+				}
 			}
 			
 			g2d.dispose();
 		}
 		
-		public void setShape (Shape s)
+		public void setShapes (Object[] o)
 		{
-			if (s != null)
-				this.shape = s;
+			if (o != null)
+				this.intersections = o;
 		}
 	}
 	
@@ -250,6 +254,8 @@ public class MainWindow
 	
 	public void checkIntersection()
 	{
+		ArrayList<Shape> intersections = new ArrayList<Shape>();
+		
 		for (int i = 0; i < dLabels.length; i++)
 		{
 			if (dLabels[i] == null || dLabels[i+1] == null)
@@ -260,14 +266,17 @@ public class MainWindow
 				{
 					if (dLabels[i].getBounds().intersects(dLabels[j].getBounds()))
 					{
-						paintingComponent.setShape(dLabels[i].getBounds().intersection(dLabels[j].getBounds()));
-						paintingComponent.repaint();
+						intersections.add(dLabels[i].getBounds().intersection(dLabels[j].getBounds()));
 					}
-					
 					if (dLabels[j+1] == null)
 						break;
 				}
 			}
+		}
+		
+		if (!intersections.isEmpty())
+		{
+			paintingComponent.setShapes(intersections.toArray());
 		}
 	}
 }
