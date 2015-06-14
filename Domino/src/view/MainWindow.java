@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -12,7 +13,10 @@ import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -25,18 +29,21 @@ import control.DominoGame.MouseClickMotionListener;
 
 public class MainWindow
 {
+	/** Die paintingComponent rendert jeden Frame */
 	private PaintingComponent paintingComponent = new PaintingComponent();
+	/** Eine Liste der Bilder der Dominosteine, die gerendert werden sollen */
 	private ArrayList<RenderImage> renderedImages = new ArrayList<RenderImage>();
 	private MouseClickMotionListener mouseHandler;
 	private JLabel lbl_mouseX = new JLabel();
 	private JLabel lbl_mouseY = new JLabel();
-	private DominoLabel[] dLabels = new DominoLabel[28];
+	private ArrayList<DominoLabel> dLabels = new ArrayList<DominoLabel>() ;
+	private Container contentPane;
 	
 	public void initializeWindow(Stone[] allStones, MouseClickMotionListener mouseHandler)
 	{
 		this.mouseHandler = mouseHandler;
 		JFrame frame = new JFrame("TestFenster");
-		Container contentPane = frame.getContentPane();
+		contentPane = frame.getContentPane();
 
 		lbl_mouseX.addMouseMotionListener(mouseHandler);
 		lbl_mouseX.setBounds(0, 0, 50, 20);
@@ -79,23 +86,23 @@ public class MainWindow
 			
 			imageLabel.addMouseListener(mouseHandler);
 			
-			dLabels[0] = new DominoLabel(allStones[0]);
-			dLabels[1] = new DominoLabel(allStones[1]);
-			dLabels[2] = new DominoLabel(allStones[2]);
+			dLabels.add(new DominoLabel(allStones[0]));
+			dLabels.add(new DominoLabel(allStones[1]));
+			dLabels.add(new DominoLabel(allStones[2]));
 			
-			dLabels[0].setLocation(contentPane.getWidth()/2 - dLabels[0].getWidth()/2, contentPane.getHeight()/2 - dLabels[0].getHeight()/2);
-			dLabels[0].addMouseListener(mouseHandler);
-			dLabels[0].addMouseMotionListener(mouseHandler);
-			dLabels[1].setLocation(contentPane.getWidth()/2 - dLabels[0].getWidth(), contentPane.getHeight()/2 + dLabels[0].getHeight()/2 +5);
-			dLabels[1].addMouseListener(mouseHandler);
-			dLabels[1].addMouseMotionListener(mouseHandler);
-			dLabels[2].setLocation((int) (contentPane.getWidth()/2 - dLabels[0].getWidth()*1.5), contentPane.getHeight()/2 + dLabels[1].getHeight()*2);
-			dLabels[2].addMouseListener(mouseHandler);
-			dLabels[2].addMouseMotionListener(mouseHandler);
+			dLabels.get(0).setLocation(contentPane.getWidth()/2 - dLabels.get(0).getWidth()/2, contentPane.getHeight()/2 - dLabels.get(0).getHeight()/2);
+			dLabels.get(0).addMouseListener(mouseHandler);
+			dLabels.get(0).addMouseMotionListener(mouseHandler);
+			dLabels.get(1).setLocation(contentPane.getWidth()/2 - dLabels.get(0).getWidth(), contentPane.getHeight()/2 + dLabels.get(0).getHeight()/2 +5);
+			dLabels.get(1).addMouseListener(mouseHandler);
+			dLabels.get(1).addMouseMotionListener(mouseHandler);
+			dLabels.get(2).setLocation((int) (contentPane.getWidth()/2 - dLabels.get(0).getWidth()*1.5), contentPane.getHeight()/2 + dLabels.get(1).getHeight()*2);
+			dLabels.get(2).addMouseListener(mouseHandler);
+			dLabels.get(2).addMouseMotionListener(mouseHandler);
 			
-			contentPane.add(dLabels[0]);
-			contentPane.add(dLabels[1]);
-			contentPane.add(dLabels[2]);
+			contentPane.add(dLabels.get(0));
+			contentPane.add(dLabels.get(1));
+			contentPane.add(dLabels.get(2));
 			contentPane.add(paintingComponent);
 			contentPane.add(imageLabel);
 			//contentPane.add(imageLabel3);
@@ -114,7 +121,7 @@ public class MainWindow
 			paintingComponent.setSize(new Dimension(800, 600));
 			
 			prepareRender(allStones[0].getIcon(), 0, new Dimension(x+w, (int) (y+0.75*h)), new Dimension(w, h));
-			prepareRender(allStones[1].getIcon(), 0, new Dimension((int) (x+2*w-5), (int) (y+0.75*h + 10)), new Dimension(w, h));
+			prepareRender(allStones[1].getIcon(), 59, new Dimension((int) (x+2*w-5), (int) (y+0.75*h + 10)), new Dimension(w, h));
 			prepareRender(allStones[2].getIcon(), 0, new Dimension((int) (x+3*w+2), (int) (y+0.75*h)), new Dimension(w, h));
 			prepareRender(allStones[3].getIcon(), 0, new Dimension((int) (x+4*w+3), (int) (y+0.75*h)), new Dimension(w, h));
 			
@@ -151,6 +158,7 @@ public class MainWindow
 	{
 		private static final long serialVersionUID = 1L;
 		private Object[] intersections;
+		private Object[] intersectionColors;
 		
 		/**
 		 * Darf nicht vom Programmierer aufgerufen werden! Java ruft diese Methode bei bedarf selbst auf.
@@ -220,21 +228,39 @@ public class MainWindow
 			
 			if (intersections != null)
 			{
-				System.out.println("Intersections: " + intersections.length);
+				int z = 0;
+				
+				textOut("Intersections: " + intersections.length);
+				
 				for (Object s: intersections)
 				{
-					g2d.setColor(Color.RED);
+					if ((Boolean) intersectionColors[z] == true)
+						g2d.setColor(Color.GREEN);
+					else
+						g2d.setColor(Color.RED);
 					g2d.fill((Shape)s);
+					
+					z++;
 				}
 			}
+			else
+				textOut("Intersections: " + 0);
 			
 			g2d.dispose();
 		}
 		
-		public void setShapes (Object[] o)
+		public void setIntersectionShapes (Object[] shapes, Object[] colors)
 		{
-			if (o != null)
-				this.intersections = o;
+			if (shapes != null)
+			{
+				this.intersections = shapes;
+				this.intersectionColors = colors;
+			}
+			else
+			{
+				this.intersections = null;
+				this.intersectionColors = null;
+			}
 		}
 	}
 	
@@ -252,31 +278,69 @@ public class MainWindow
 		lbl_mouseY.setSize(lbl_mouseY.getText().length() * 6, 20);
 	}
 	
-	public void checkIntersection()
+	public void addDominoe(Stone s, Point p)
+	{
+		textOut("addDominoe wurde aufgerufen");
+		
+		dLabels.add(new DominoLabel(s));
+		dLabels.get(dLabels.size()-1).setLocation(p);
+		dLabels.get(dLabels.size()-1).setVisible(true);
+		
+		contentPane.add(dLabels.get(dLabels.size()-1));
+	}
+	
+	public Rectangle checkIntersection()
 	{
 		ArrayList<Shape> intersections = new ArrayList<Shape>();
+		ArrayList<Boolean> intersectionColors = new ArrayList<Boolean>();
+		int i = 0;
+		int lastIndex = dLabels.size() - 1;
 		
-		for (int i = 0; i < dLabels.length; i++)
+		for (DominoLabel d: dLabels)
 		{
-			if (dLabels[i] == null || dLabels[i+1] == null)
+			if (d == null || (i+1) > lastIndex)
 				break;
 			else
 			{
-				for (int j = i+1; j < dLabels.length; j++) 
+				for (int j = i+1; j < dLabels.size(); j++) 
 				{
-					if (dLabels[i].getBounds().intersects(dLabels[j].getBounds()))
+					if (dLabels.get(i).getBounds().intersects(dLabels.get(j).getBounds()))
 					{
-						intersections.add(dLabels[i].getBounds().intersection(dLabels[j].getBounds()));
+						intersections.add(dLabels.get(i).getBounds().intersection(dLabels.get(j).getBounds()));
+						intersectionColors.add(checkCompatibility(dLabels.get(i), dLabels.get(j)));
 					}
-					if (dLabels[j+1] == null)
+					if ((j+1) > lastIndex)
 						break;
 				}
 			}
+			i++;
 		}
 		
 		if (!intersections.isEmpty())
 		{
-			paintingComponent.setShapes(intersections.toArray());
+			paintingComponent.setIntersectionShapes(intersections.toArray(), intersectionColors.toArray());
+			
+			return (Rectangle) intersections.get(0);
 		}
+		else
+		{
+			paintingComponent.setIntersectionShapes(null, null);
+			return null;
+		}
+	}
+
+	private Boolean checkCompatibility(DominoLabel d1, DominoLabel d2)
+	{
+		int d1_p1 = d1.getStone().getPips1();
+		int d1_p2 = d1.getStone().getPips2();
+		int d2_p1 = d2.getStone().getPips1();
+		int d2_p2 = d2.getStone().getPips2();
+		
+		if (d1_p1 == d2_p1 || d1_p2 == d2_p1 || d1_p2 == d2_p1 || d1_p2 == d2_p2)
+		{
+			return true;
+		}
+		else
+			return false;
 	}
 }

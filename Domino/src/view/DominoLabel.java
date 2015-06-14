@@ -14,6 +14,16 @@ public class DominoLabel extends JLabel
 	{
 		System.out.println("Konstruktor Domino");
 		this.stone = stone;
+		updateImage();
+	}
+	
+	public Stone getStone()
+	{
+		return stone;
+	}
+	
+	public void updateImage()
+	{
 		this.setIcon(new ImageIcon(this.stone.getIcon()));
 		this.setSize(this.getIcon().getIconWidth(), this.getIcon().getIconHeight());
 	}

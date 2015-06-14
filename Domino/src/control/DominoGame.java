@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.PointerInfo;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -202,6 +203,8 @@ public class DominoGame
 	public class MouseClickMotionListener implements MouseListener, MouseMotionListener
 	{
 		private PointerInfo mousePos;
+		private Stone draggedStone;
+		private Rectangle target;
 		
 		@Override
 		public void mouseDragged(MouseEvent e)
@@ -213,16 +216,16 @@ public class DominoGame
 			{
 				view.textOut("Ich bin im MouseDragged");
 				DominoLabel d = (DominoLabel) e.getSource();
+				draggedStone = d.getStone();
 				int offsetX = d.getTopLevelAncestor().getX() + d.getWidth()/2;
 				int offsetY = d.getTopLevelAncestor().getY() + d.getHeight();
 				
 				d.setLocation(mousePos.getLocation().x - offsetX, mousePos.getLocation().y - offsetY);
 				
-				view.checkIntersection();
+				target = view.checkIntersection();
 				
 				view.textOut("Autoscroll:" + d.getAutoscrolls());
 			}
-			
 			
 			e.consume();
 		}
@@ -232,6 +235,11 @@ public class DominoGame
 		{
 			mousePos = MouseInfo.getPointerInfo();
 			view.showMousePosition(mousePos.getLocation().x, mousePos.getLocation().y);
+			
+			Object o = e.getSource();
+			
+			if (o instanceof DominoLabel)
+				draggedStone = ((DominoLabel) o).getStone();
 		}
 
 		@Override
@@ -241,11 +249,19 @@ public class DominoGame
 			
 			Object c = e.getSource();
 			
-			if (c instanceof JLabel)
+			if (c instanceof DominoLabel)
+			{
+				draggedStone = ((DominoLabel) c).getStone();
+				System.err.println("Yeah, ich habe auf ein DominoLabel geklickt!");
+				draggedStone.rotateImage(90);
+				((DominoLabel) c).updateImage();
+			}
+			
+			else if (c instanceof JLabel)
 				view.textOut("Yeah, ich habe auf ein JLabel geklickt!");
 			
-			if (c instanceof DominoLabel)
-				System.err.println("Yeah, ich habe auf ein DominoLabel geklickt!");
+			else
+				view.addDominoe(allPlayers[0].getHand().get(2), mousePos.getLocation());
 			
 			e.consume();			
 		}
@@ -271,7 +287,13 @@ public class DominoGame
 		@Override
 		public void mouseReleased(MouseEvent e)
 		{
-			// TODO Auto-generated method stub
+			if (draggedStone != null)
+				view.textOut(draggedStone.getPips1() + "|" + draggedStone.getPips2());
+			
+			if (target != null)
+				view.textOut("Es gibt ein target");
+			else
+				view.textOut("Es gibt leider kein target");
 		}
 		
 	}
