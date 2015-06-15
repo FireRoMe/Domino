@@ -45,7 +45,7 @@ public class Stone
 		
 		//String fileName = new String("ImageSrc/transparenzTest" + pips1 + "_" + pips2 + ".png");
 		//String fileName = new String("ImageSrc/transparenzTest" + 2 + "_" + 4 + "_new" + ".png");
-		String fileName = new String("ImageSrc/" + pips1 + "_" + pips2 + ".png");
+		String fileName = new String("ImageSrc/" + "new" + pips1 + "_" + pips2 + ".png");
 		System.out.println("Dateiname: " + fileName);
 		try {
 			//if (pips1 == 2 && pips2 == 4)		// TODO passendes Bild raussuchen
@@ -65,25 +65,7 @@ public class Stone
 		int z = angle / 90;
 		for (int i = 1; i<=z; i++)
 		{
-			double degrees;
-			int originX = 1;
-			int originY = 0;
-			
-			if (rotated == false)
-			{
-				System.out.println("Gedreht!");
-				degrees = 90;
-				rotated = true;
-			}
-			else
-			{
-				System.out.println("Zurueck gedreht!");
-				degrees = 90;
-				rotated = false;
-				
-				originX -= 2;
-				originY -= 1;
-			}
+			double degrees = 90;
 			
 			double radians = Math.toRadians(degrees);
 			double sin = Math.abs(Math.sin(radians));
@@ -102,7 +84,7 @@ public class Stone
 			at.setToRotation(radians, x + (icon.getWidth(null) / 2), y + (icon.getHeight(null) / 2));
 			at.translate(x, y);
 			g2d.setTransform(at);
-			g2d.drawImage(rawImage, originX, originY, null);
+			g2d.drawImage(rawImage, 0, 0, null);
 			g2d.dispose();
 			
 			rawImage = rotate;

@@ -8,6 +8,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
@@ -23,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import data.Stone;
 import control.DominoGame.MouseClickMotionListener;
@@ -33,26 +35,27 @@ public class MainWindow
 	private PaintingComponent paintingComponent = new PaintingComponent();
 	/** Eine Liste der Bilder der Dominosteine, die gerendert werden sollen */
 	private ArrayList<RenderImage> renderedImages = new ArrayList<RenderImage>();
+	private JFrame frame;
 	private MouseClickMotionListener mouseHandler;
 	private JLabel lbl_mouseX = new JLabel();
 	private JLabel lbl_mouseY = new JLabel();
 	private ArrayList<DominoLabel> dLabels = new ArrayList<DominoLabel>() ;
-	private Container contentPane;
+	private JPanel contentPane;
 	
 	public void initializeWindow(Stone[] allStones, MouseClickMotionListener mouseHandler)
 	{
 		this.mouseHandler = mouseHandler;
-		JFrame frame = new JFrame("TestFenster");
-		contentPane = frame.getContentPane();
+		frame = new JFrame("TestFenster");
+		contentPane = (JPanel) frame.getContentPane();
 
 		lbl_mouseX.addMouseMotionListener(mouseHandler);
 		lbl_mouseX.setBounds(0, 0, 50, 20);
 		lbl_mouseY.addMouseMotionListener(mouseHandler);
-		lbl_mouseX.setBounds(0, 20, 50, 20);
+		lbl_mouseY.setBounds(0, 20, 50, 20);
 		
 		contentPane.setBackground(Color.LIGHT_GRAY);
 		contentPane.setVisible(true);
-		contentPane.setSize(800, 600);
+		contentPane.setSize(1280, 720);
 		contentPane.setLayout(null);
 		contentPane.add(lbl_mouseX);
 		contentPane.add(lbl_mouseY);
@@ -104,7 +107,7 @@ public class MainWindow
 			contentPane.add(dLabels.get(1));
 			contentPane.add(dLabels.get(2));
 			contentPane.add(paintingComponent);
-			contentPane.add(imageLabel);
+//			contentPane.add(imageLabel);
 			//contentPane.add(imageLabel3);
 			imageLabel.setBounds(15, 50, 100, 50);
 			
@@ -118,7 +121,7 @@ public class MainWindow
 			imageLabel2.setBounds(x+w+1, y, w, h);
 			imageLabel3.setBounds(x+2*(w+1), y, w, h);
 			
-			paintingComponent.setSize(new Dimension(800, 600));
+			paintingComponent.setSize(new Dimension(contentPane.getWidth(), contentPane.getHeight()));
 			
 			prepareRender(allStones[0].getIcon(), 0, new Dimension(x+w, (int) (y+0.75*h)), new Dimension(w, h));
 			prepareRender(allStones[1].getIcon(), 59, new Dimension((int) (x+2*w-5), (int) (y+0.75*h + 10)), new Dimension(w, h));
@@ -140,8 +143,14 @@ public class MainWindow
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		/*
+		 * Fenster anhand Bildschirmauflösung zentriert ausrichten
+		 */
+		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		int x = contentPane.getWidth() - (screen.width / 2);
+		int y = contentPane.getHeight() - (screen.height / 2);
 		
-		frame.setBounds(400, 300, contentPane.getWidth(), contentPane.getHeight());
+		frame.setBounds(x, y, contentPane.getWidth(), contentPane.getHeight());
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
@@ -230,7 +239,7 @@ public class MainWindow
 			{
 				int z = 0;
 				
-				textOut("Intersections: " + intersections.length);
+//				textOut("Intersections: " + intersections.length);
 				
 				for (Object s: intersections)
 				{
@@ -243,8 +252,8 @@ public class MainWindow
 					z++;
 				}
 			}
-			else
-				textOut("Intersections: " + 0);
+//			else
+//				textOut("Intersections: " + 0);
 			
 			g2d.dispose();
 		}
@@ -282,17 +291,24 @@ public class MainWindow
 	{
 		textOut("addDominoe wurde aufgerufen");
 		
-		dLabels.add(new DominoLabel(s));
-		dLabels.get(dLabels.size()-1).setLocation(p);
-		dLabels.get(dLabels.size()-1).setVisible(true);
+		DominoLabel d = new DominoLabel(s);
+		dLabels.add(d);
+		d.setLocation(p);
+		d.setVisible(true);
+		d.addMouseListener(mouseHandler);
+		d.addMouseMotionListener(mouseHandler);
 		
-		contentPane.add(dLabels.get(dLabels.size()-1));
+		contentPane.add(d, 5);
+		
+		contentPane.updateUI();
 	}
 	
-	public Rectangle checkIntersection()
+	public DominoLabel checkIntersection(DominoLabel draggedStone, boolean released)
 	{
 		ArrayList<Shape> intersections = new ArrayList<Shape>();
 		ArrayList<Boolean> intersectionColors = new ArrayList<Boolean>();
+		DominoLabel target = null;
+		
 		int i = 0;
 		int lastIndex = dLabels.size() - 1;
 		
@@ -308,6 +324,11 @@ public class MainWindow
 					{
 						intersections.add(dLabels.get(i).getBounds().intersection(dLabels.get(j).getBounds()));
 						intersectionColors.add(checkCompatibility(dLabels.get(i), dLabels.get(j)));
+						
+						if (dLabels.get(j) == draggedStone)
+							target = dLabels.get(i);
+						else if (dLabels.get(i) == draggedStone)
+							target = dLabels.get(j);
 					}
 					if ((j+1) > lastIndex)
 						break;
@@ -320,13 +341,53 @@ public class MainWindow
 		{
 			paintingComponent.setIntersectionShapes(intersections.toArray(), intersectionColors.toArray());
 			
-			return (Rectangle) intersections.get(0);
+			if (released == true)
+			{
+				MoveStone(draggedStone, target, intersections, intersectionColors);
+			}
+			
+			return target;
 		}
 		else
 		{
 			paintingComponent.setIntersectionShapes(null, null);
 			return null;
 		}
+	}
+
+	private void MoveStone(DominoLabel draggedStone, DominoLabel target, ArrayList<Shape> intersections, ArrayList<Boolean> intersectionColors)
+	{
+		if (intersectionColors.get(0) == true)
+		{
+			int tPosX = target.getLocation().x;
+			int tPosY = target.getLocation().y;
+			int dPosX = draggedStone.getLocation().x;
+			int dPosY = draggedStone.getLocation().y;
+			int stoneWidth = draggedStone.getWidth();
+			int stoneHeight = draggedStone.getHeight();
+			int w = intersections.get(0).getBounds().width;
+			int h = intersections.get(0).getBounds().height;
+			
+			if (dPosX > tPosX && dPosY > tPosY)
+			{
+				draggedStone.setLocation(dPosX+w, dPosY-(stoneHeight-h));
+			}
+			if (dPosX < tPosX && dPosY > tPosY)
+			{
+				draggedStone.setLocation(dPosX+(tPosX-dPosX)+stoneWidth, dPosY-(stoneHeight-h));
+			}
+			if (dPosX > tPosX && dPosY < tPosY)
+			{
+				draggedStone.setLocation(dPosX+w, dPosY+(tPosY-dPosY));
+			}
+			if (dPosX < tPosX && dPosY < tPosY)
+			{
+				draggedStone.setLocation(dPosX+(tPosX-dPosX)+stoneWidth, dPosY+(tPosY-dPosY));
+			}
+			checkIntersection(draggedStone, false);
+		}
+		else
+			textOut("Steine sind leider nicht kompatibel");
 	}
 
 	private Boolean checkCompatibility(DominoLabel d1, DominoLabel d2)
@@ -336,7 +397,7 @@ public class MainWindow
 		int d2_p1 = d2.getStone().getPips1();
 		int d2_p2 = d2.getStone().getPips2();
 		
-		if (d1_p1 == d2_p1 || d1_p2 == d2_p1 || d1_p2 == d2_p1 || d1_p2 == d2_p2)
+		if (d1_p1 == d2_p1 || d1_p1 == d2_p2 || d1_p2 == d2_p1 || d1_p2 == d2_p2)
 		{
 			return true;
 		}

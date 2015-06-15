@@ -203,8 +203,8 @@ public class DominoGame
 	public class MouseClickMotionListener implements MouseListener, MouseMotionListener
 	{
 		private PointerInfo mousePos;
-		private Stone draggedStone;
-		private Rectangle target;
+		private DominoLabel draggedStone;
+		private DominoLabel target;
 		
 		@Override
 		public void mouseDragged(MouseEvent e)
@@ -214,17 +214,14 @@ public class DominoGame
 			
 			if (e.getSource() instanceof DominoLabel)
 			{
-				view.textOut("Ich bin im MouseDragged");
 				DominoLabel d = (DominoLabel) e.getSource();
-				draggedStone = d.getStone();
+				draggedStone = d;
 				int offsetX = d.getTopLevelAncestor().getX() + d.getWidth()/2;
 				int offsetY = d.getTopLevelAncestor().getY() + d.getHeight();
 				
 				d.setLocation(mousePos.getLocation().x - offsetX, mousePos.getLocation().y - offsetY);
 				
-				target = view.checkIntersection();
-				
-				view.textOut("Autoscroll:" + d.getAutoscrolls());
+				target = view.checkIntersection(draggedStone, false);
 			}
 			
 			e.consume();
@@ -239,7 +236,7 @@ public class DominoGame
 			Object o = e.getSource();
 			
 			if (o instanceof DominoLabel)
-				draggedStone = ((DominoLabel) o).getStone();
+				draggedStone = (DominoLabel) o;
 		}
 
 		@Override
@@ -251,17 +248,26 @@ public class DominoGame
 			
 			if (c instanceof DominoLabel)
 			{
-				draggedStone = ((DominoLabel) c).getStone();
+				draggedStone = (DominoLabel) c;
 				System.err.println("Yeah, ich habe auf ein DominoLabel geklickt!");
-				draggedStone.rotateImage(90);
-				((DominoLabel) c).updateImage();
+				draggedStone.getStone().rotateImage(90);
+				draggedStone.updateImage();
 			}
 			
 			else if (c instanceof JLabel)
 				view.textOut("Yeah, ich habe auf ein JLabel geklickt!");
 			
 			else
-				view.addDominoe(allPlayers[0].getHand().get(2), mousePos.getLocation());
+			{
+				int index = allPlayers[0].getHand().size() - 1;
+				if (index >= 0)
+				{
+					view.addDominoe(allPlayers[0].getHand().get(index), e.getPoint());
+					allPlayers[0].getHand().remove(index);
+				}
+				else
+					view.textOut("Dieser Spieler hat keine Steine mehr");
+			}
 			
 			e.consume();			
 		}
@@ -288,10 +294,14 @@ public class DominoGame
 		public void mouseReleased(MouseEvent e)
 		{
 			if (draggedStone != null)
-				view.textOut(draggedStone.getPips1() + "|" + draggedStone.getPips2());
+				view.textOut(draggedStone.getStone().getPips1() + "|" + draggedStone.getStone().getPips2());
 			
 			if (target != null)
+			{
 				view.textOut("Es gibt ein target");
+				view.checkIntersection(draggedStone, true);
+				view.textOut("Target: " + target.getStone().getPips1() + "|" + target.getStone().getPips2());
+			}
 			else
 				view.textOut("Es gibt leider kein target");
 		}
