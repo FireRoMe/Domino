@@ -34,7 +34,13 @@ public final class DominoRules
 		Stone tStone = target.getStone();
 		
 		if (tStone.getPips2() == dStone.getPips1())
-			return true;
+		{
+			if(tStone.getRightNeighbour() == null)
+				return true;
+			else
+				return false;
+		}	
+			
 		else
 			return true; //TODO
 	}

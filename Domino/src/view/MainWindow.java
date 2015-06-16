@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -120,10 +121,10 @@ public class MainWindow
 			paint.setImage(steinIcon);
 			paint.setDegrees(270);
 			paint.setImageSize(w, h);
-			paint.setPosX(x+w+1);		// X Für Drehung um 270 Grad (anhand Position vom linken Nachbarn)
-			paint.setPosY(y+0.75*h);	// Y Für Drehung um 270 Grad (anhand Position vom linken Nachbarn)
-			//paint.setPosX(x+3*w+1);	// X Für Drehung um 90 Grad (anhand Position vom linken Nachbarn)
-			//paint.setPosY(y+0.25*h);	// Y Für Drehung um 90 Grad (anhand Position vom linken Nachbarn)
+			paint.setPosX(x+w+1);		// X Fï¿½r Drehung um 270 Grad (anhand Position vom linken Nachbarn)
+			paint.setPosY(y+0.75*h);	// Y Fï¿½r Drehung um 270 Grad (anhand Position vom linken Nachbarn)
+			//paint.setPosX(x+3*w+1);	// X Fï¿½r Drehung um 90 Grad (anhand Position vom linken Nachbarn)
+			//paint.setPosY(y+0.25*h);	// Y Fï¿½r Drehung um 90 Grad (anhand Position vom linken Nachbarn)
 			*/
 			
 			System.out.println(rect.toString());
@@ -132,12 +133,20 @@ public class MainWindow
 			e.printStackTrace();
 		}
 		/*
-		 * Fenster anhand Bildschirmauflösung zentriert ausrichten
+		 * Fenster anhand Bildschirmauflï¿½sung zentriert ausrichten
 		 */
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		Properties p = System.getProperties();
+		String os = p.getProperty("os.name");
 		textOut("Aufloesung: " + (int) screen.getWidth() + "x" + (int) screen.getHeight());
 		int x = contentPane.getWidth() - (screen.width / 2);
 		int y = contentPane.getHeight() - (screen.height / 2);
+		textOut(os);
+		if(os.toLowerCase().contains("mac"))
+		{
+			x = contentPane.getWidth() - screen.width;
+			y = contentPane.getHeight() - screen.height;
+		}
 		
 		frame.setBounds(x, y, contentPane.getWidth(), contentPane.getHeight());
 		frame.setResizable(false);
@@ -164,7 +173,7 @@ public class MainWindow
 		@Override
 		protected void paintComponent(Graphics g)
 		{
-			super.paintComponent(g);	// Bevor gezeichnet wird, wird die Zeichenfläche geleert.
+			super.paintComponent(g);	// Bevor gezeichnet wird, wird die Zeichenflï¿½che geleert.
 			
 			/*
 			AffineTransform at = AffineTransform.getTranslateInstance(posX, posY);
@@ -402,7 +411,19 @@ public class MainWindow
 			}
 			else
 			{
+				if (!draggedStone.getStone().isDoublestone())
+				{
+					if (!target.getStone().isDoublestone())
+						draggedStone.setLocation(tPosX-draggedWidth, tPosY);
+					else
+						draggedStone.setLocation(tPosX-draggedWidth, tPosY-(targetHeight/2));
+				}
+				else
+				{
+					draggedStone.setLocation(tPosX-draggedWidth, tPosY-(targetHeight/2));
+				}
 				
+				target.getStone().setRightNeighbour(draggedStone.getStone());
 			}
 			checkIntersection(draggedStone, false);		// Ueberschneidungen neu berechnen, um Grafikfehler zu vermeiden
 		}
