@@ -160,4 +160,64 @@ public class Stone
 	{
 		return player;
 	}
+
+	public boolean checkRotation(Stone target)
+	{
+		if (pips1 != target.getPips2())
+		{
+			rotateImage(180);
+			togglePips();
+			
+			return true;
+		}
+		else return false;
+	}
+	
+	private void togglePips()
+	{
+		int temp = pips1;
+		pips1 = pips2;
+		pips2 = temp;
+	}
+
+	public Stone getLeftNeighbour()
+	{
+		return leftNeighbour;
+	}
+	
+	public void setLeftNeighbour(final Stone s)
+	{
+		leftNeighbour = s;
+	}
+
+	public Stone getRightNeighbour()
+	{
+		return rightNeighbour;
+	}
+
+	public void setRightNeighbour(final Stone s)
+	{
+		this.rightNeighbour = s;
+		System.out.println("Rechter Nachbar von " + pips1 + "|" + pips2 +  " ist " + s.pips1 + "|" + s.pips2);
+	}
+
+	public Stone getTopNeighbour()
+	{
+		return topNeighbour;
+	}
+
+	public void setTopNeighbour(final Stone s)
+	{
+		this.topNeighbour = s;
+	}
+
+	public Stone getBottomNeighbour()
+	{
+		return bottomNeighbour;
+	}
+
+	public void setBottomNeighbour(final Stone s)
+	{
+		this.bottomNeighbour = s;
+	}
 }

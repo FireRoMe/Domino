@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 
 import data.Stone;
 import control.DominoGame.MouseClickMotionListener;
+import control.DominoRules;
 
 public class MainWindow
 {
@@ -89,23 +90,10 @@ public class MainWindow
 			
 			imageLabel.addMouseListener(mouseHandler);
 			
-			dLabels.add(new DominoLabel(allStones[0]));
-			dLabels.add(new DominoLabel(allStones[1]));
-			dLabels.add(new DominoLabel(allStones[2]));
+			addDominoe(allStones[25], contentPane.getWidth()/2 - 25, contentPane.getHeight()/2 - 25);
+			addDominoe(allStones[26], contentPane.getWidth()/2 - 50, contentPane.getHeight()/2 + 30);
+			addDominoe(allStones[27], contentPane.getWidth()/2 - 75, contentPane.getHeight()/2 + 100);
 			
-			dLabels.get(0).setLocation(contentPane.getWidth()/2 - dLabels.get(0).getWidth()/2, contentPane.getHeight()/2 - dLabels.get(0).getHeight()/2);
-			dLabels.get(0).addMouseListener(mouseHandler);
-			dLabels.get(0).addMouseMotionListener(mouseHandler);
-			dLabels.get(1).setLocation(contentPane.getWidth()/2 - dLabels.get(0).getWidth(), contentPane.getHeight()/2 + dLabels.get(0).getHeight()/2 +5);
-			dLabels.get(1).addMouseListener(mouseHandler);
-			dLabels.get(1).addMouseMotionListener(mouseHandler);
-			dLabels.get(2).setLocation((int) (contentPane.getWidth()/2 - dLabels.get(0).getWidth()*1.5), contentPane.getHeight()/2 + dLabels.get(1).getHeight()*2);
-			dLabels.get(2).addMouseListener(mouseHandler);
-			dLabels.get(2).addMouseMotionListener(mouseHandler);
-			
-			contentPane.add(dLabels.get(0));
-			contentPane.add(dLabels.get(1));
-			contentPane.add(dLabels.get(2));
 			contentPane.add(paintingComponent);
 //			contentPane.add(imageLabel);
 			//contentPane.add(imageLabel3);
@@ -147,6 +135,7 @@ public class MainWindow
 		 * Fenster anhand Bildschirmauflösung zentriert ausrichten
 		 */
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		textOut("Aufloesung: " + (int) screen.getWidth() + "x" + (int) screen.getHeight());
 		int x = contentPane.getWidth() - (screen.width / 2);
 		int y = contentPane.getHeight() - (screen.height / 2);
 		
@@ -291,16 +280,35 @@ public class MainWindow
 	{
 		textOut("addDominoe wurde aufgerufen");
 		
+		if (s.isDoublestone() == true)
+			s.rotateImage(90);
+		
 		DominoLabel d = new DominoLabel(s);
 		dLabels.add(d);
 		d.setLocation(p);
-		d.setVisible(true);
 		d.addMouseListener(mouseHandler);
 		d.addMouseMotionListener(mouseHandler);
 		
-		contentPane.add(d, 5);
+		contentPane.add(d, 2);
 		
+		checkIntersection(d, false);
 		contentPane.updateUI();
+	}
+	
+	public void addDominoe(Stone s, int x, int y)
+	{
+		if (s.isDoublestone() == true)
+			s.rotateImage(90);
+		
+		dLabels.add(new DominoLabel(s));
+		DominoLabel d = dLabels.get(dLabels.size()-1);
+		d.setLocation(x, y);
+		d.addMouseListener(mouseHandler);
+		d.addMouseMotionListener(mouseHandler);
+		
+		contentPane.add(d, 2);
+		
+		checkIntersection(d, false);
 	}
 	
 	public DominoLabel checkIntersection(DominoLabel draggedStone, boolean released)
@@ -323,12 +331,19 @@ public class MainWindow
 					if (dLabels.get(i).getBounds().intersects(dLabels.get(j).getBounds()))
 					{
 						intersections.add(dLabels.get(i).getBounds().intersection(dLabels.get(j).getBounds()));
-						intersectionColors.add(checkCompatibility(dLabels.get(i), dLabels.get(j)));
 						
 						if (dLabels.get(j) == draggedStone)
+						{
 							target = dLabels.get(i);
+							intersectionColors.add(DominoRules.checkCompatibility(dLabels.get(j), target));
+						}
 						else if (dLabels.get(i) == draggedStone)
+						{
 							target = dLabels.get(j);
+							intersectionColors.add(DominoRules.checkCompatibility(dLabels.get(i), target));
+						}
+						else
+							intersectionColors.add(DominoRules.checkCompatibility(dLabels.get(i), dLabels.get(j)));
 					}
 					if ((j+1) > lastIndex)
 						break;
@@ -343,7 +358,7 @@ public class MainWindow
 			
 			if (released == true)
 			{
-				MoveStone(draggedStone, target, intersections, intersectionColors);
+				moveStone(draggedStone, target, intersections, intersectionColors);
 			}
 			
 			return target;
@@ -355,53 +370,43 @@ public class MainWindow
 		}
 	}
 
-	private void MoveStone(DominoLabel draggedStone, DominoLabel target, ArrayList<Shape> intersections, ArrayList<Boolean> intersectionColors)
+	private void moveStone(DominoLabel draggedStone, DominoLabel target, ArrayList<Shape> intersections, ArrayList<Boolean> intersectionColors)
 	{
 		if (intersectionColors.get(0) == true)
 		{
 			int tPosX = target.getLocation().x;
 			int tPosY = target.getLocation().y;
-			int dPosX = draggedStone.getLocation().x;
-			int dPosY = draggedStone.getLocation().y;
-			int stoneWidth = draggedStone.getWidth();
-			int stoneHeight = draggedStone.getHeight();
-			int w = intersections.get(0).getBounds().width;
-			int h = intersections.get(0).getBounds().height;
+			int draggedWidth = draggedStone.getWidth();
+			int draggedHeight = draggedStone.getHeight();
+			int targetWidth = target.getWidth();
+			int targetHeight = target.getHeight();
 			
-			if (dPosX > tPosX && dPosY > tPosY)
+			if (DominoRules.snapRight(draggedStone, target))
 			{
-				draggedStone.setLocation(dPosX+w, dPosY-(stoneHeight-h));
+				if (draggedStone.getStone().checkRotation(target.getStone()))
+					draggedStone.updateImage();
+				
+				if (!draggedStone.getStone().isDoublestone())
+				{
+					if (!target.getStone().isDoublestone())
+						draggedStone.setLocation(tPosX+draggedWidth, tPosY);
+					else
+						draggedStone.setLocation(tPosX+(draggedWidth/2), tPosY+(draggedHeight/2));
+				}
+				else
+				{
+					draggedStone.setLocation(tPosX+targetWidth, tPosY-(targetHeight/2));
+				}
+				
+				target.getStone().setRightNeighbour(draggedStone.getStone());
 			}
-			if (dPosX < tPosX && dPosY > tPosY)
+			else
 			{
-				draggedStone.setLocation(dPosX+(tPosX-dPosX)+stoneWidth, dPosY-(stoneHeight-h));
+				
 			}
-			if (dPosX > tPosX && dPosY < tPosY)
-			{
-				draggedStone.setLocation(dPosX+w, dPosY+(tPosY-dPosY));
-			}
-			if (dPosX < tPosX && dPosY < tPosY)
-			{
-				draggedStone.setLocation(dPosX+(tPosX-dPosX)+stoneWidth, dPosY+(tPosY-dPosY));
-			}
-			checkIntersection(draggedStone, false);
+			checkIntersection(draggedStone, false);		// Ueberschneidungen neu berechnen, um Grafikfehler zu vermeiden
 		}
 		else
 			textOut("Steine sind leider nicht kompatibel");
-	}
-
-	private Boolean checkCompatibility(DominoLabel d1, DominoLabel d2)
-	{
-		int d1_p1 = d1.getStone().getPips1();
-		int d1_p2 = d1.getStone().getPips2();
-		int d2_p1 = d2.getStone().getPips1();
-		int d2_p2 = d2.getStone().getPips2();
-		
-		if (d1_p1 == d2_p1 || d1_p1 == d2_p2 || d1_p2 == d2_p1 || d1_p2 == d2_p2)
-		{
-			return true;
-		}
-		else
-			return false;
 	}
 }
