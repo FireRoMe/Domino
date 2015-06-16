@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -135,6 +136,8 @@ public class MainWindow
 		 * Fenster anhand Bildschirmauflösung zentriert ausrichten
 		 */
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		Properties p = System.getProperties();
+		textOut(p.getProperty("os.name"));
 		textOut("Aufloesung: " + (int) screen.getWidth() + "x" + (int) screen.getHeight());
 		int x = contentPane.getWidth() - (screen.width / 2);
 		int y = contentPane.getHeight() - (screen.height / 2);
@@ -399,10 +402,11 @@ public class MainWindow
 				}
 				
 				target.getStone().setRightNeighbour(draggedStone.getStone());
+				draggedStone.getStone().setLeftNeighbour(target.getStone());
 			}
 			else
 			{
-				
+				//TODO
 			}
 			checkIntersection(draggedStone, false);		// Ueberschneidungen neu berechnen, um Grafikfehler zu vermeiden
 		}

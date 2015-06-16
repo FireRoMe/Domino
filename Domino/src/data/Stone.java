@@ -188,6 +188,7 @@ public class Stone
 	public void setLeftNeighbour(final Stone s)
 	{
 		leftNeighbour = s;
+		System.out.println("Linker Nachbar von " + pips1 + "|" + pips2 +  " ist " + s.pips1 + "|" + s.pips2);
 	}
 
 	public Stone getRightNeighbour()
