@@ -161,16 +161,62 @@ public class Stone
 		return player;
 	}
 
-	public boolean checkRotation(Stone target)
+	public boolean checkRotationHorizontal(Stone target, boolean snapRight)
 	{
-		if (pips1 != target.getPips2())
+		if (snapRight)
 		{
-			rotateImage(180);
-			togglePips();
-			
-			return true;
+			if (pips1 != target.getPips2())
+			{
+				rotateImage(180);
+				togglePips();
+				
+				return true;
+			}
+			else 
+				return false;
 		}
-		else return false;
+		else
+		{
+			if (pips2 != target.getPips1())
+			{
+				rotateImage(180);
+				togglePips();
+				
+				return true;
+			}
+			else 
+				return false;
+		}
+	}
+	
+	public boolean checkRotationVertical(Stone target, boolean snapTop)
+	{
+		setVertical(true);
+		rotateImage(90);
+		if (snapTop)
+		{
+			if (pips2 != target.getPips1())
+			{
+				rotateImage(180);
+				togglePips();
+				
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+		{
+			if (pips1 != target.getPips2())
+			{
+				rotateImage(180);
+				togglePips();
+				
+				return true;
+			}
+			else
+				return false;
+		}
 	}
 	
 	private void togglePips()
@@ -188,7 +234,8 @@ public class Stone
 	public void setLeftNeighbour(final Stone s)
 	{
 		leftNeighbour = s;
-		System.out.println("Linker Nachbar von " + pips1 + "|" + pips2 +  " ist " + s.pips1 + "|" + s.pips2);
+		if (s != null)
+			System.out.println("Linker Nachbar von " + pips1 + "|" + pips2 +  " ist " + s.pips1 + "|" + s.pips2);
 	}
 
 	public Stone getRightNeighbour()
@@ -199,7 +246,8 @@ public class Stone
 	public void setRightNeighbour(final Stone s)
 	{
 		this.rightNeighbour = s;
-		System.out.println("Rechter Nachbar von " + pips1 + "|" + pips2 +  " ist " + s.pips1 + "|" + s.pips2);
+		if (s != null)
+			System.out.println("Rechter Nachbar von " + pips1 + "|" + pips2 +  " ist " + s.pips1 + "|" + s.pips2);
 	}
 
 	public Stone getTopNeighbour()
@@ -220,5 +268,38 @@ public class Stone
 	public void setBottomNeighbour(final Stone s)
 	{
 		this.bottomNeighbour = s;
+	}
+
+	public void clearNeighbours()
+	{
+		if (leftNeighbour != null)
+			leftNeighbour.setRightNeighbour(null);
+		if (rightNeighbour != null)
+			rightNeighbour.setLeftNeighbour(null);
+		
+		leftNeighbour = null;
+		rightNeighbour = null;
+		bottomNeighbour = null;
+		topNeighbour = null;
+	}
+	
+	public void setSpinner(boolean isSpinner)
+	{
+		this.spinner = isSpinner;
+	}
+	
+	public boolean isSpinner()
+	{
+		return spinner;
+	}
+	
+	public void setVertical (boolean isVertical)
+	{
+		this.vertical = isVertical;
+	}
+	
+	public boolean isVertical()
+	{
+		return vertical;
 	}
 }

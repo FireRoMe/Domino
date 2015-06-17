@@ -1,10 +1,8 @@
 package control;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.PointerInfo;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -23,6 +21,10 @@ public class DominoGame
 	private Stone[] allStones = new Stone[28];
 	private ArrayList<Stone> talon = new ArrayList<Stone>();
 	private Player[] allPlayers;
+	/** Ein Array, in dem die Punkte der offenen Enden gespeichert werden. <br>
+	 * [0]: links<br>[1]: rechts<br>[2]: oben<br>[3]: unten */
+	private int[] edgePoints = new int[4];
+	private boolean hasSpinner = false;
 	private MainWindow view;
 	
 	/**
@@ -32,6 +34,12 @@ public class DominoGame
 	public DominoGame(MainWindow view, int numPlayers)
 	{
 		allPlayers = new Player[numPlayers];
+		
+		for (int e: edgePoints)
+		{
+			e = new Integer(0);
+		}
+		
 		this.view = view;
 		initializeGame();
 	}
@@ -163,7 +171,7 @@ public class DominoGame
 		int playerID = 0;
 		
 		if (numPlayers == 2)
-			numStones = 7;
+			numStones = 14;
 		else
 			numStones = 5;
 		
@@ -200,6 +208,9 @@ public class DominoGame
 		}
 	}
 	
+	/**
+	 *  Von diesem Listener werden alle Mausgesten ausgewertet und verarbeitet
+	 */  
 	public class MouseClickMotionListener implements MouseListener, MouseMotionListener
 	{
 		private PointerInfo mousePos;
@@ -215,13 +226,22 @@ public class DominoGame
 			if (e.getSource() instanceof DominoLabel)
 			{
 				DominoLabel d = (DominoLabel) e.getSource();
-				draggedStone = d;
-				int offsetX = d.getTopLevelAncestor().getX() + d.getWidth()/2;
-				int offsetY = d.getTopLevelAncestor().getY() + d.getHeight();
 				
-				d.setLocation(mousePos.getLocation().x - offsetX, mousePos.getLocation().y - offsetY);
-				
-				target = view.checkIntersection(draggedStone, false);
+				if (d.isDraggable())
+				{
+					draggedStone = d;
+					int offsetX = d.getTopLevelAncestor().getX() + d.getWidth()/2;
+					int offsetY = d.getTopLevelAncestor().getY() + d.getHeight();
+					
+					d.setLocation(mousePos.getLocation().x - offsetX, mousePos.getLocation().y - offsetY);
+					
+					target = view.checkIntersection(draggedStone, false, edgePoints);
+					
+					if (target == null)
+						draggedStone.getStone().clearNeighbours();
+				}
+				else
+					view.textOut("Dieser Stein laesst sich nicht mehr verschieben");
 			}
 			
 			e.consume();
@@ -249,9 +269,9 @@ public class DominoGame
 			if (c instanceof DominoLabel)
 			{
 				draggedStone = (DominoLabel) c;
+				Stone s = draggedStone.getStone();
 				System.err.println("Yeah, ich habe auf ein DominoLabel geklickt!");
-				draggedStone.getStone().rotateImage(90);
-				draggedStone.updateImage();
+				view.textOut("Stein " + s.getPips1() + "|" + s.getPips2() + " vertikal: " + s.isVertical());
 			}
 			
 			else if (c instanceof JLabel)
@@ -299,11 +319,19 @@ public class DominoGame
 			if (target != null)
 			{
 				view.textOut("Es gibt ein target");
-				view.checkIntersection(draggedStone, true);
+				
+				if (draggedStone.getStone().isDoublestone() && !hasSpinner)
+					draggedStone.getStone().setSpinner(true);
+				else if (target.getStone().isDoublestone() && !target.getStone().isSpinner() && !hasSpinner)
+					target.getStone().setSpinner(true);
+				
+				view.checkIntersection(draggedStone, true, edgePoints);
 				view.textOut("Target: " + target.getStone().getPips1() + "|" + target.getStone().getPips2());
 			}
 			else
+			{
 				view.textOut("Es gibt leider kein target");
+			}
 		}
 		
 	}
