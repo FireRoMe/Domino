@@ -1,5 +1,7 @@
 package control;
 
+import java.awt.Point;
+
 import data.Stone;
 import view.DominoLabel;
 
@@ -16,11 +18,11 @@ public final class DominoRules
 		{
 			if (!target.getStone().isDoublestone())
 			{
-				
+				//TODO
 			}
 			else
 			{
-				
+				//TODO
 			}
 			return true;
 		}
@@ -30,9 +32,10 @@ public final class DominoRules
 	
 	/**
 	 * Prueft, ob an der rechten Seite des Steins angelegt werden kann
-	 * @param dragged - Der Stein, der gelegt werden soll
+	 * @param draggedStone - Der Stein, der gelegt werden soll
 	 * @param target - Der Stein, an den angelegt werden soll
-	 * @return false - true, wenn 
+	 * @return <b>true</b> - Der Stein soll rechts angelegt werden<br>
+	 * <b>false</b> - Der Stein soll links angelegt werden
 	 */
 	public static boolean snapRight(DominoLabel draggedStone, DominoLabel target)
 	{
@@ -100,7 +103,7 @@ public final class DominoRules
 				dStone.checkRotationVertical(tStone, false);
 				draggedStone.updateImage();
 				
-				return true;
+				return false;
 			}
 		}
 		
@@ -124,10 +127,10 @@ public final class DominoRules
 	 * Prueft, welche Seite des Zielsteins mit dem anzulegenden Stein kompatibel ist
 	 * @param dragged - Der Stein, der gelegt werden soll
 	 * @param target - Der Stein, an den angelegt werden soll
-	 * @return <b>1</b> - wenn die linke Seite des Zielsteins mit <br>
+	 * @return <b>0</b> - wenn das Ziel ein Doppelstein ist <br>
+	 * <b>1</b> - wenn die linke Seite des Zielsteins mit <br>
 	 * einer Seite des zu legenden Steins uebereinstimmt <br> 
 	 * <b>2</b> - sonst
-	 * Ist das Ziel ein Doppelstein wird immer <b>2</b> zurueckgegeben
 	 */
 	private static int giveEqualPip(Stone dragged, Stone target)
 	{
@@ -144,7 +147,17 @@ public final class DominoRules
 	{
 		Stone tStone = target.getStone();
 		
-		if (tStone.isSpinner() && (tStone.getLeftNeighbour() != null && tStone.getRightNeighbour() != null))
+		if (tStone.getLeftNeighbour() != null && tStone.getRightNeighbour() != null)
+		{
+			System.err.println("checkIFVertical: \n\r"
+					+ "Spinner: " + tStone.isSpinner() + "\n\r"
+					+ "Links: " + tStone.getLeftNeighbour().getPips1() + "|" + tStone.getLeftNeighbour().getPips2() + "\n\r"
+					+ "Rechts: " + tStone.getRightNeighbour().getPips1() + "|" + tStone.getRightNeighbour().getPips2());
+		}
+		else
+			System.err.println("Kein Spinner");
+		
+		if (tStone.isSpinner() && tStone.getLeftNeighbour() != null && tStone.getRightNeighbour() != null)
 			return true;
 		
 		else if (tStone.isVertical())
@@ -152,5 +165,120 @@ public final class DominoRules
 		
 		else
 			return false;
+	}
+	
+	public static boolean checkPossibleMove(Stone target, DominoLabel draggedStone, Point errorPoint)
+	{
+		String error = "Dieser Zug ist leider nicht moeglich";
+		
+		Stone left = target.getLeftNeighbour();
+		Stone right = target.getRightNeighbour();
+		Stone top = target.getTopNeighbour();
+		Stone bottom = target.getBottomNeighbour();
+		
+		if (!target.isVertical())
+			if (!target.isSpinner())
+			{
+				if (left == null || right == null)
+				{
+					return true;
+				}
+				else
+				{
+					System.out.println(error);
+//					draggedStone.setLocation(errorPoint);
+					return false;
+				}
+			}
+			else
+			{
+				if (left == null || right == null || top == null || bottom == null)
+				{
+					return true;
+				}
+				else
+				{
+					System.out.println(error);
+//					draggedStone.setLocation(errorPoint);
+					return false;
+				}
+			}
+		else
+		{
+			if (top == null || bottom == null)
+			{
+				return true;
+			}
+			else
+			{
+				System.out.println(error);
+//				draggedStone.setLocation(errorPoint);
+				return false;
+			}
+		}
+	}
+	
+	public static void calculatePointsLeft(DominoLabel draggedStone, DominoLabel target, int[] edgePoints)
+	{
+		if (!draggedStone.getStone().isDoublestone())
+			edgePoints[0] = draggedStone.getStone().getPips1();
+		else
+			edgePoints[0] = draggedStone.getStone().getValue();
+		
+		if (target.getStone().getRightNeighbour() == null)
+		{
+			if (!target.getStone().isDoublestone())
+				edgePoints[1] = target.getStone().getPips2();
+			else
+				edgePoints[1] = target.getStone().getValue();
+		}
+	}
+
+	public static void calculatePointsRight(DominoLabel draggedStone, DominoLabel target, int[] edgePoints)
+	{
+		if (!draggedStone.getStone().isDoublestone())
+			edgePoints[1] = draggedStone.getStone().getPips2();
+		else
+			edgePoints[1] = draggedStone.getStone().getValue();
+		
+		if (target.getStone().getLeftNeighbour() == null)
+		{
+			if (!target.getStone().isDoublestone())
+				edgePoints[0] = target.getStone().getPips1();
+			else
+				edgePoints[0] = target.getStone().getValue();
+		}
+	}
+
+	public static void calculatePointsBottom(DominoLabel draggedStone, DominoLabel target, int[] edgePoints)
+	{
+		if (!draggedStone.getStone().isDoublestone())
+			edgePoints[3] = draggedStone.getStone().getPips2();
+		else
+			edgePoints[3] = draggedStone.getStone().getValue();
+		
+		if (target.getStone().getTopNeighbour() == null)
+		{
+			if (!target.getStone().isDoublestone())
+				edgePoints[2] = target.getStone().getPips1();
+			else
+				edgePoints[2] = target.getStone().getValue();
+		}
+	}
+
+	public static void calculatePointsTop(DominoLabel draggedStone, DominoLabel target, int[] edgePoints)
+	{
+		if (!draggedStone.getStone().isDoublestone())
+			edgePoints[2] = draggedStone.getStone().getPips1();
+		else
+			edgePoints[2] = draggedStone.getStone().getValue();
+		
+		if (target.getStone().getBottomNeighbour() == null)
+		{
+			if (!target.getStone().isDoublestone())
+				edgePoints[3] = target.getStone().getPips2();
+			else
+				edgePoints[3] = target.getStone().getValue();
+		}
 	}
 }

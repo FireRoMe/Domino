@@ -39,10 +39,12 @@ public class MainWindow
 	private ArrayList<RenderImage> renderedImages = new ArrayList<RenderImage>();
 	private JFrame frame;
 	private MouseClickMotionListener mouseHandler;
-	private JLabel lbl_mouseX = new JLabel();
-	private JLabel lbl_mouseY = new JLabel();
+	private JLabel lbl_mouseX = new JLabel("Position X: 0");
+	private JLabel lbl_mouseY = new JLabel("Position Y: 0");
 	private PointsLabel lbl_points = new PointsLabel("Punkte: 0");
 	private ArrayList<DominoLabel> dLabels = new ArrayList<DominoLabel>() ;
+	private JPanel graphicsPane = new JPanel();
+	private JPanel handPane = new JPanel();
 	private JPanel contentPane;
 	
 	public void initializeWindow(Stone[] allStones, MouseClickMotionListener mouseHandler)
@@ -50,19 +52,36 @@ public class MainWindow
 		this.mouseHandler = mouseHandler;
 		frame = new JFrame("TestFenster");
 		contentPane = (JPanel) frame.getContentPane();
-
-		lbl_mouseX.setBounds(0, 0, 50, 20);
-		lbl_mouseY.setBounds(0, 20, 50, 20);
 		
-		contentPane.setBackground(Color.LIGHT_GRAY);
-		contentPane.setVisible(true);
-		contentPane.setSize(1280, 720);
+		JLabel lbl_help1 = new JLabel("Rechte Maustaste gedrueckt halten, um das Spielfeld zu verschieben");
+		JLabel lbl_help2 = new JLabel("Mit linker Maustaste auf eine freie Fläche klicken, um einen Stein zu ziehen");
+		
 		contentPane.setLayout(null);
+		contentPane.setBounds(0, 0, 1280, 720);
 		contentPane.add(lbl_mouseX);
 		contentPane.add(lbl_mouseY);
 		contentPane.add(lbl_points);
-		contentPane.addMouseListener(mouseHandler);
-		contentPane.addMouseMotionListener(mouseHandler);
+		contentPane.add(lbl_help1);
+		contentPane.add(lbl_help2);
+		contentPane.add(handPane);
+		contentPane.add(graphicsPane);
+		
+		lbl_help1.setBounds(440, 5, 400, 20);
+		lbl_help1.setHorizontalAlignment(JLabel.CENTER);
+		lbl_help2.setBounds(415, 25, 450, 20);
+		lbl_help2.setHorizontalAlignment(JLabel.CENTER);
+		
+		lbl_mouseX.setBounds(0, 0, 100, 20);
+		lbl_mouseY.setBounds(0, 20, 100, 20);
+		
+		handPane.setBackground(new Color(0,100,15));
+		handPane.setBounds(0, 570, 1280, 720);
+		
+		graphicsPane.setBackground(Color.LIGHT_GRAY);
+		graphicsPane.setBounds(-1420, -580, 3200, 1800);
+		graphicsPane.setLayout(null);
+		graphicsPane.addMouseListener(mouseHandler);
+		graphicsPane.addMouseMotionListener(mouseHandler);
 		
 		lbl_points.setBounds(contentPane.getWidth() - 70, 0, 70, 20);
 		
@@ -93,11 +112,13 @@ public class MainWindow
 			
 			imageLabel.addMouseListener(mouseHandler);
 			
-			addDominoe(allStones[25], contentPane.getWidth()/2 - 25, contentPane.getHeight()/2 - 25);
-			addDominoe(allStones[26], contentPane.getWidth()/2 - 50, contentPane.getHeight()/2 + 30);
-			addDominoe(allStones[27], contentPane.getWidth()/2 - 75, contentPane.getHeight()/2 + 100);
+			addDominoe(allStones[25], 10, graphicsPane.getHeight() - (allStones[25].getIcon().getHeight(null)*2 + 45));
+			textOut("dLabels Size: " + dLabels.size());
+			addDominoe(allStones[26], dLabels.get(dLabels.size() - 1).getWidth() + 20, dLabels.get(dLabels.size() - 1).getY());
+			textOut("dLabels Size: " + dLabels.size());
+			addDominoe(allStones[27], dLabels.get(dLabels.size() - 1).getWidth() + 130, dLabels.get(dLabels.size() - 1).getY());
 			
-			contentPane.add(paintingComponent);
+			graphicsPane.add(paintingComponent);
 //			contentPane.add(imageLabel);
 			//contentPane.add(imageLabel3);
 			imageLabel.setBounds(15, 50, 100, 50);
@@ -112,12 +133,12 @@ public class MainWindow
 			imageLabel2.setBounds(x+w+1, y, w, h);
 			imageLabel3.setBounds(x+2*(w+1), y, w, h);
 			
-			paintingComponent.setSize(new Dimension(contentPane.getWidth(), contentPane.getHeight()));
+			paintingComponent.setSize(new Dimension(graphicsPane.getWidth(), graphicsPane.getHeight()));
 			
-			prepareRender(allStones[0].getIcon(), 0, new Dimension(x+w, (int) (y+0.75*h)), new Dimension(w, h));
-			prepareRender(allStones[1].getIcon(), 59, new Dimension((int) (x+2*w-5), (int) (y+0.75*h + 10)), new Dimension(w, h));
-			prepareRender(allStones[2].getIcon(), 0, new Dimension((int) (x+3*w+2), (int) (y+0.75*h)), new Dimension(w, h));
-			prepareRender(allStones[3].getIcon(), 0, new Dimension((int) (x+4*w+3), (int) (y+0.75*h)), new Dimension(w, h));
+//			prepareRender(allStones[0].getIcon(), 0, new Dimension(x+w, (int) (y+0.75*h)), new Dimension(w, h));
+//			prepareRender(allStones[1].getIcon(), 59, new Dimension((int) (x+2*w-5), (int) (y+0.75*h + 10)), new Dimension(w, h));
+//			prepareRender(allStones[2].getIcon(), 0, new Dimension((int) (x+3*w+2), (int) (y+0.75*h)), new Dimension(w, h));
+//			prepareRender(allStones[3].getIcon(), 0, new Dimension((int) (x+4*w+3), (int) (y+0.75*h)), new Dimension(w, h));
 			
 			/*
 			paint.setImage(steinIcon);
@@ -311,9 +332,10 @@ public class MainWindow
 		d.addMouseListener(mouseHandler);
 		d.addMouseMotionListener(mouseHandler);
 		
-		contentPane.add(d, 3);
+		graphicsPane.add(d, 0);
 		
 		checkIntersection(d, false, lbl_points.getPoints());
+		graphicsPane.updateUI();
 		contentPane.updateUI();
 	}
 	
@@ -328,9 +350,11 @@ public class MainWindow
 		d.addMouseListener(mouseHandler);
 		d.addMouseMotionListener(mouseHandler);
 		
-		contentPane.add(d, 3);
+		graphicsPane.add(d, 0);
 		
 		checkIntersection(d, false, lbl_points.getPoints());
+		graphicsPane.updateUI();
+		contentPane.updateUI();
 	}
 	
 	public DominoLabel checkIntersection(DominoLabel draggedStone, boolean released, int[] edgePoints)
@@ -397,7 +421,7 @@ public class MainWindow
 	
 	private void moveStoneHorizontal(DominoLabel draggedStone, DominoLabel target, ArrayList<Boolean> intersectionColors, int[] edgePoints)
 	{
-		if (intersectionColors.get(0) == true)		// wenn die beiden Steine kompatibel sind
+		if (intersectionColors.get(0) == true && draggedStone.isDraggable())		// wenn die beiden Steine kompatibel sind
 		{
 			int tPosX = target.getLocation().x;
 			int tPosY = target.getLocation().y;
@@ -424,9 +448,7 @@ public class MainWindow
 				target.getStone().setRightNeighbour(draggedStone.getStone());
 				draggedStone.getStone().setLeftNeighbour(target.getStone());
 				
-				edgePoints[1] = draggedStone.getStone().getPips2();			//TODO Punktesystem
-				if (target.getStone().getLeftNeighbour() == null)
-					edgePoints[0] = target.getStone().getPips1();
+				DominoRules.calculatePointsRight(draggedStone, target, edgePoints);
 			}
 			else
 			{
@@ -445,9 +467,7 @@ public class MainWindow
 				target.getStone().setLeftNeighbour(draggedStone.getStone());
 				draggedStone.getStone().setRightNeighbour(target.getStone());
 				
-				edgePoints[0] = draggedStone.getStone().getPips1();
-				if (target.getStone().getRightNeighbour() == null)
-					edgePoints[1] = target.getStone().getPips2();
+				DominoRules.calculatePointsLeft(draggedStone, target, edgePoints);
 				
 			}
 			draggedStone.setNotDraggable();
@@ -460,10 +480,10 @@ public class MainWindow
 		else
 			textOut("Steine sind leider nicht kompatibel");
 	}
-	
+
 	private void moveStoneVertical(DominoLabel draggedStone, DominoLabel target, ArrayList<Boolean> intersectionColors, int[] edgePoints)
 	{
-		if (intersectionColors.get(0) == true)
+		if (intersectionColors.get(0) == true && draggedStone.isDraggable())
 		{
 			int tPosX = target.getLocation().x;
 			int tPosY = target.getLocation().y;
@@ -481,24 +501,60 @@ public class MainWindow
 						draggedStone.setLocation(tPosX, tPosY-targetHeight);
 					else
 					{
-						System.err.println("Ich war hier!");
-						draggedStone.setLocation(tPosX+(draggedHeight/2), tPosY+draggedHeight);	//TODO
+						System.err.println("Normalen Stein vertikal oben an Doppelstein angelegt");
+						draggedStone.setLocation(tPosX+(draggedHeight/2), tPosY-draggedHeight*2);
 					}
 				}
 				else
-					draggedStone.setLocation(tPosX-(draggedHeight/2), tPosY-draggedHeight);
+				{
+					System.err.println("Doppelstein oben angelegt");
+					draggedStone.setLocation(tPosX-(targetWidth/2), tPosY-targetWidth);
+				}
 
 				target.getStone().setTopNeighbour(draggedStone.getStone());
 				draggedStone.getStone().setBottomNeighbour(target.getStone());
 				
-				edgePoints[2] = draggedStone.getStone().getPips1();
-				if (target.getStone().getBottomNeighbour() == null)
-					edgePoints[3] = target.getStone().getPips2();
+				DominoRules.calculatePointsTop(draggedStone, target, edgePoints);
+				
+			}
+			else
+			{
+				textOut("Lege unten an");
+				if (!draggedStone.getStone().isDoublestone())
+				{
+					if(target.getStone().isSpinner() || !target.getStone().isDoublestone())
+						draggedStone.setLocation(tPosX, tPosY+targetHeight);
+					else
+					{
+						System.err.println("Normalen Stein vertikal unten an Doppelstein angelegt");
+						draggedStone.setLocation(tPosX+(draggedHeight/2), tPosY+draggedHeight);
+					}
+				}
+				else
+				{
+					System.err.println("Doppelstein unten angelegt");
+					draggedStone.setLocation(tPosX-(targetWidth/2), tPosY+draggedWidth*2);
+				}
+				
+				target.getStone().setBottomNeighbour(draggedStone.getStone());
+				draggedStone.getStone().setTopNeighbour(target.getStone());
+				
+				DominoRules.calculatePointsBottom(draggedStone, target, edgePoints);
 			}
 			
 			draggedStone.setNotDraggable();
 			target.setNotDraggable();
 			checkIntersection(draggedStone, false, edgePoints);
+			
+			lbl_points.setPoints(edgePoints);
+			updatePoints();
 		}
+	}
+	
+	public void updatePanels()
+	{
+		contentPane.updateUI();
+		graphicsPane.updateUI();
+		handPane.updateUI();
 	}
 }

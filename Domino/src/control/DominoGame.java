@@ -1,8 +1,11 @@
 package control;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.PointerInfo;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import view.DominoLabel;
 import view.MainWindow;
@@ -171,7 +175,7 @@ public class DominoGame
 		int playerID = 0;
 		
 		if (numPlayers == 2)
-			numStones = 14;
+			numStones = 12;
 		else
 			numStones = 5;
 		
@@ -216,34 +220,81 @@ public class DominoGame
 		private PointerInfo mousePos;
 		private DominoLabel draggedStone;
 		private DominoLabel target;
+		/** Der Punkt, an den ein nicht passender Stein zurückgeschoben wird */
+		private Point errorPoint= null;	//TODO
+		/** Die derzeit gedueckte Maustaste */
+		private int pressedButton;
+		private int draggedAtX, draggedAtY;
+		private int panelOffsetX = 0, panelOffsetY = 0;
 		
 		@Override
 		public void mouseDragged(MouseEvent e)
 		{
 			mousePos = MouseInfo.getPointerInfo();
-			view.showMousePosition(mousePos.getLocation().x, mousePos.getLocation().y);
+			int mouseX = mousePos.getLocation().x;
+			int mouseY = mousePos.getLocation().y;
+			int offsetX, offsetY;
 			
-			if (e.getSource() instanceof DominoLabel)
+			view.showMousePosition(mouseX, mouseY);
+			
+			if (pressedButton == 1)
 			{
-				DominoLabel d = (DominoLabel) e.getSource();
-				
-				if (d.isDraggable())
+				if (e.getSource() instanceof DominoLabel)
 				{
-					draggedStone = d;
-					int offsetX = d.getTopLevelAncestor().getX() + d.getWidth()/2;
-					int offsetY = d.getTopLevelAncestor().getY() + d.getHeight();
+					DominoLabel d = (DominoLabel) e.getSource();
 					
-					d.setLocation(mousePos.getLocation().x - offsetX, mousePos.getLocation().y - offsetY);
-					
-					target = view.checkIntersection(draggedStone, false, edgePoints);
-					
-					if (target == null)
-						draggedStone.getStone().clearNeighbours();
+					if (d.isDraggable())
+					{
+						errorPoint = d.getLocation();
+						
+						draggedStone = d;
+						
+						if (!d.getStone().isDoublestone() && !d.getStone().isVertical())
+						{
+							offsetX = panelOffsetX + d.getWidth()/2 - 425;
+							offsetY = panelOffsetY + d.getHeight() - 280;
+						}
+						else
+						{
+							offsetX = panelOffsetX + d.getWidth()/2 - 373;
+							offsetY = panelOffsetY + d.getHeight() - 353;
+						}
+						
+						d.setLocation(offsetX + mouseX, offsetY + mouseY);
+						
+						target = view.checkIntersection(draggedStone, false, edgePoints);
+						
+						if (target == null)
+							draggedStone.getStone().clearNeighbours();
+					}
+					else
+						view.textOut("Dieser Stein laesst sich nicht mehr verschieben");
 				}
-				else
-					view.textOut("Dieser Stein laesst sich nicht mehr verschieben");
+			}
+			else if (pressedButton == 3)
+			{
+				if (e.getSource() instanceof JPanel)
+				{
+					view.textOut("JPanel gedraggt");
+					JPanel p = (JPanel) e.getSource();
+					
+//					offsetX = p.getTopLevelAncestor().getX() + p.getWidth()/2;
+//					offsetY = p.getTopLevelAncestor().getY() + p.getHeight()/2;
+					
+					view.textOut("Mit Maus: " + p.getLocation(mousePos.getLocation()));
+					view.textOut("Ohne Maus: " + p.getLocation());
+					view.textOut("OnScreen: " + p.getLocationOnScreen());
+					view.textOut("MausPos: " + mousePos.getLocation().x + "|" + mousePos.getLocation().y);
+					e.translatePoint(draggedAtX, draggedAtY);
+					p.setLocation(mouseX - draggedAtX, mouseY - draggedAtY);
+					
+					panelOffsetX = - p.getLocation().x;
+					panelOffsetY = - p.getLocation().y;
+					view.textOut("panelOffset: " + panelOffsetX + "|" + panelOffsetY);
+				}
 			}
 			
+			view.updatePanels();
 			e.consume();
 		}
 
@@ -253,6 +304,15 @@ public class DominoGame
 			mousePos = MouseInfo.getPointerInfo();
 			view.showMousePosition(mousePos.getLocation().x, mousePos.getLocation().y);
 			
+			if (e.getSource() instanceof JPanel && panelOffsetX == 0)
+			{
+				JPanel p = (JPanel) e.getSource();
+				panelOffsetX = - p.getLocation().x;
+				panelOffsetY = - p.getLocation().y;
+				
+				view.textOut("panelOffset gesetzt");
+			}
+				
 			Object o = e.getSource();
 			
 			if (o instanceof DominoLabel)
@@ -264,29 +324,32 @@ public class DominoGame
 		{
 			view.textOut("Geklickt!");
 			
-			Object c = e.getSource();
-			
-			if (c instanceof DominoLabel)
+			if (e.getButton() == 1)
 			{
-				draggedStone = (DominoLabel) c;
-				Stone s = draggedStone.getStone();
-				System.err.println("Yeah, ich habe auf ein DominoLabel geklickt!");
-				view.textOut("Stein " + s.getPips1() + "|" + s.getPips2() + " vertikal: " + s.isVertical());
-			}
-			
-			else if (c instanceof JLabel)
-				view.textOut("Yeah, ich habe auf ein JLabel geklickt!");
-			
-			else
-			{
-				int index = allPlayers[0].getHand().size() - 1;
-				if (index >= 0)
+				Object c = e.getSource();
+				
+				if (c instanceof DominoLabel)
 				{
-					view.addDominoe(allPlayers[0].getHand().get(index), e.getPoint());
-					allPlayers[0].getHand().remove(index);
+					draggedStone = (DominoLabel) c;
+					Stone s = draggedStone.getStone();
+					System.err.println("Yeah, ich habe auf ein DominoLabel geklickt!");
+					view.textOut("Stein " + s.getPips1() + "|" + s.getPips2() + " vertikal: " + s.isVertical() + ", spinner: " + s.isSpinner());
 				}
+				
+				else if (c instanceof JLabel)
+					view.textOut("Yeah, ich habe auf ein JLabel geklickt!");
+				
 				else
-					view.textOut("Dieser Spieler hat keine Steine mehr");
+				{
+					int index = allPlayers[0].getHand().size() - 1;
+					if (index >= 0)
+					{
+						view.addDominoe(allPlayers[0].getHand().get(index), e.getPoint());
+						allPlayers[0].getHand().remove(index);
+					}
+					else
+						view.textOut("Dieser Spieler hat keine Steine mehr");
+				}
 			}
 			
 			e.consume();			
@@ -307,31 +370,59 @@ public class DominoGame
 		@Override
 		public void mousePressed(MouseEvent e)
 		{
-			// TODO Auto-generated method stub
+			view.textOut("Maustaste " + e.getButton() + " gedrueckt");
+			
+			draggedAtX = e.getX() + 323;
+			draggedAtY = e.getY() + 206;
+			view.textOut("draggedAt: " + draggedAtX + "|"+ draggedAtY);
+			pressedButton = e.getButton();
+			
+			if (pressedButton == 3 && e.getSource() instanceof JPanel)
+			{
+				JPanel p = (JPanel) e.getSource();
+				p.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+			}
+				
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e)
 		{
+			if (e.getSource() instanceof JPanel)
+			{
+				JPanel p = (JPanel) e.getSource();
+				p.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
 			if (draggedStone != null)
-				view.textOut(draggedStone.getStone().getPips1() + "|" + draggedStone.getStone().getPips2());
+				view.textOut("DraggedStone: " + draggedStone.getStone().getPips1() + "|" + draggedStone.getStone().getPips2());
 			
 			if (target != null)
 			{
 				view.textOut("Es gibt ein target");
 				
-				if (draggedStone.getStone().isDoublestone() && !hasSpinner)
-					draggedStone.getStone().setSpinner(true);
-				else if (target.getStone().isDoublestone() && !target.getStone().isSpinner() && !hasSpinner)
-					target.getStone().setSpinner(true);
-				
-				view.checkIntersection(draggedStone, true, edgePoints);
-				view.textOut("Target: " + target.getStone().getPips1() + "|" + target.getStone().getPips2());
+				if (DominoRules.checkPossibleMove(target.getStone(), draggedStone, errorPoint))
+				{
+					if (!hasSpinner && draggedStone.getStone().isDoublestone())
+					{
+						draggedStone.getStone().setSpinner(true);
+						hasSpinner = true;
+					}
+					else if (hasSpinner == false && target.getStone().isDoublestone() && !target.getStone().isSpinner())
+					{
+						target.getStone().setSpinner(true);
+						hasSpinner = true;
+					}
+					
+					view.checkIntersection(draggedStone, true, edgePoints);
+					view.textOut("Target: " + target.getStone().getPips1() + "|" + target.getStone().getPips2());
+				}
 			}
 			else
 			{
 				view.textOut("Es gibt leider kein target");
 			}
+			
+			view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
 		}
 		
 	}
