@@ -6,6 +6,7 @@ public class Player
 {
 	private ArrayList<Stone> hand = new ArrayList<Stone>();
 	private String name;
+	private boolean firstMove = true;
 	private int points;
 	
 	public Player(String name)
@@ -47,5 +48,15 @@ public class Player
 	public Stone placeStone(Stone s)
 	{
 		return s;
+	}
+	
+	public void setfirstMove(boolean isFirstMove)
+	{
+		this.firstMove = isFirstMove;
+	}
+	
+	public boolean isFirstMove()
+	{
+		return firstMove;
 	}
 }

@@ -13,7 +13,7 @@ public class DominoLabel extends JLabel
 	
 	public DominoLabel(Stone stone)
 	{
-		System.out.println("Konstruktor Domino");
+//		System.out.println("Konstruktor Domino");
 		this.stone = stone;
 		updateImage();
 	}

@@ -2,6 +2,7 @@ package control;
 
 import java.awt.Point;
 
+import data.Player;
 import data.Stone;
 import view.DominoLabel;
 
@@ -218,67 +219,173 @@ public final class DominoRules
 		}
 	}
 	
-	public static void calculatePointsLeft(DominoLabel draggedStone, DominoLabel target, int[] edgePoints)
+	public static boolean checkSpinner(DominoLabel draggedStone, DominoLabel target, boolean hasSpinner)
 	{
-		if (!draggedStone.getStone().isDoublestone())
-			edgePoints[0] = draggedStone.getStone().getPips1();
+		if (!hasSpinner && draggedStone.getStone().isDoublestone())
+		{
+			draggedStone.getStone().setSpinner(true);
+			return true;
+		}
+		else if (!hasSpinner && target.getStone().isDoublestone())
+		{
+			target.getStone().setSpinner(true);
+			return true;
+		}
+		else return false;
+	}
+	
+	public static void calculatePointsLeft(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
+	{
+		edgePoints[0] = draggedStone.getStone().getPips1();
+		if (draggedStone.getStone().isDoublestone())
+		{
+			doublePoints[0] = true;
+			if (edgePoints[2] == 0 && edgePoints[3] == 0)
+			{
+				edgePoints[2] = draggedStone.getStone().getPips1();
+				edgePoints[3] = draggedStone.getStone().getPips1();
+			}
+		}
 		else
-			edgePoints[0] = draggedStone.getStone().getValue();
+			doublePoints[0] = false;
 		
 		if (target.getStone().getRightNeighbour() == null)
 		{
-			if (!target.getStone().isDoublestone())
-				edgePoints[1] = target.getStone().getPips2();
-			else
-				edgePoints[1] = target.getStone().getValue();
+			edgePoints[1] = target.getStone().getPips2();
+			if (target.getStone().isDoublestone())
+			{
+				doublePoints[1] = true;
+				if (edgePoints[2] == 0 && edgePoints[3] == 0)
+				{
+					edgePoints[2] = target.getStone().getPips2();
+					edgePoints[3] = target.getStone().getPips2();
+				}
+			}
 		}
+		else
+			doublePoints[1] = false;
 	}
 
-	public static void calculatePointsRight(DominoLabel draggedStone, DominoLabel target, int[] edgePoints)
+	public static void calculatePointsRight(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
 	{
-		if (!draggedStone.getStone().isDoublestone())
-			edgePoints[1] = draggedStone.getStone().getPips2();
+		edgePoints[1] = draggedStone.getStone().getPips2();
+		if (draggedStone.getStone().isDoublestone())
+		{
+			doublePoints[1] = true;
+			if (edgePoints[2] == 0 && edgePoints[3] == 0)
+			{
+				edgePoints[2] = draggedStone.getStone().getPips2();
+				edgePoints[3] = draggedStone.getStone().getPips2();
+			}
+		}
 		else
-			edgePoints[1] = draggedStone.getStone().getValue();
+			doublePoints[1] = false;
 		
 		if (target.getStone().getLeftNeighbour() == null)
 		{
-			if (!target.getStone().isDoublestone())
-				edgePoints[0] = target.getStone().getPips1();
-			else
-				edgePoints[0] = target.getStone().getValue();
+			edgePoints[0] = target.getStone().getPips1();
+			if (target.getStone().isDoublestone())
+			{
+				doublePoints[0] = true;
+				if (edgePoints[2] == 0 && edgePoints[3] == 0)
+				{
+					edgePoints[2] = target.getStone().getPips2();
+					edgePoints[3] = target.getStone().getPips2();
+				}
+			}
 		}
+		else
+			doublePoints[0] = false;
 	}
 
-	public static void calculatePointsBottom(DominoLabel draggedStone, DominoLabel target, int[] edgePoints)
+	public static void calculatePointsBottom(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
 	{
-		if (!draggedStone.getStone().isDoublestone())
-			edgePoints[3] = draggedStone.getStone().getPips2();
+		edgePoints[3] = draggedStone.getStone().getPips2();
+		if (draggedStone.getStone().isDoublestone())
+			doublePoints[3] = true;
 		else
-			edgePoints[3] = draggedStone.getStone().getValue();
+			doublePoints[3] = false;
 		
 		if (target.getStone().getTopNeighbour() == null)
 		{
-			if (!target.getStone().isDoublestone())
-				edgePoints[2] = target.getStone().getPips1();
-			else
-				edgePoints[2] = target.getStone().getValue();
+			edgePoints[2] = target.getStone().getPips1();
+			if (target.getStone().isDoublestone() && !target.getStone().isSpinner())
+				doublePoints[2] = true;
 		}
+		else
+			doublePoints[2] = false;
 	}
 
-	public static void calculatePointsTop(DominoLabel draggedStone, DominoLabel target, int[] edgePoints)
+	public static void calculatePointsTop(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
 	{
-		if (!draggedStone.getStone().isDoublestone())
-			edgePoints[2] = draggedStone.getStone().getPips1();
+		edgePoints[2] = draggedStone.getStone().getPips1();
+		if (draggedStone.getStone().isDoublestone())
+			doublePoints[2] = true;
 		else
-			edgePoints[2] = draggedStone.getStone().getValue();
-		
+			doublePoints[2] = false;
+		 
 		if (target.getStone().getBottomNeighbour() == null)
 		{
-			if (!target.getStone().isDoublestone())
-				edgePoints[3] = target.getStone().getPips2();
-			else
-				edgePoints[3] = target.getStone().getValue();
+			edgePoints[3] = target.getStone().getPips2();
+			if (target.getStone().isDoublestone() && !target.getStone().isSpinner())
+				doublePoints[3] = true;
+		}
+		else
+			doublePoints[3] = false;
+	}
+
+	/**
+	 * Prueft, ob ein Stein von der Hand des Spielers auf dem Feld angelegt werden kann
+	 * @param stone - Der Stein der gelegt werden soll
+	 * @param edgePoints - Das Array, das die Punkte der offenen Enden beinhaltet
+	 * @return <b>true</b> - wenn der Stein gelegt werden kann <br>
+	 * <b>false</b> - wenn der Stein nicht gelegt werden kann
+	 */
+	public static boolean checkIfDroppable(Stone stone, int[] edgePoints, boolean hasSpinner)
+	{
+		int i = 0;
+		
+		if (edgePoints[0] == 0 && edgePoints[1] == 0)
+			return true;
+		
+		for (int points: edgePoints)
+		{
+			System.out.println("Spinner: " + hasSpinner + ", " + stone.getPips1() + ", " + stone.getPips2());
+			if (i > 1 && !hasSpinner)	// Wenn es keinen Spinner gibt muessen nicht alle Moeglichkeiten geprueft werden
+				break;
+			
+			if (points == stone.getPips1() || points == stone.getPips2())
+				return true;
+			
+			i++;
+		}
+		
+		return false;
+	}
+
+	public static int switchPlayer(Player[] allPlayers, int currentPlayerIndex)
+	{
+		allPlayers[currentPlayerIndex].setfirstMove(false);
+		
+		if ((allPlayers.length - 1) == currentPlayerIndex)
+			return 0;
+		else
+			return ++currentPlayerIndex;
+	}
+
+	public static void firstStone(Stone stone, int[] edgePoints)
+	{
+		if (stone.isDoublestone())
+		{
+			edgePoints[2] = stone.getPips1();
+			edgePoints[3] = stone.getPips1();
+			
+			stone.setSpinner(true);
+		}
+		else
+		{
+			edgePoints[0] = stone.getPips1();
+			edgePoints[1] = stone.getPips2();
 		}
 	}
 }
