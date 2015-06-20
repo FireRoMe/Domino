@@ -84,7 +84,7 @@ public class MainWindow
 		flow.setHgap(5);
 		
 		handPane.setName("Hand");
-		handPane.setBackground(new Color(0,100,15));
+		handPane.setBackground(new Color(140,100,40));
 		handPane.setBounds(0, 580, 1280, 120);
 		handPane.setLayout(flow);
 		handPane.addMouseListener(mouseHandler);
@@ -324,21 +324,7 @@ public class MainWindow
 	
 	public void updatePoints()
 	{
-		int points = 0;
-		int i = 0;
-		
-		for (int p: lbl_points.getPoints())
-		{
-			if (lbl_points.getDoublePoints()[i] == false)
-				points += p;
-			else
-			{
-				if (i != 0 && i != 1)
-					points += p*2;
-			}
-			
-			i++;
-		}
+		int points = DominoRules.calculatePoints(lbl_points.getPoints(), lbl_points.getDoublePoints());
 		
 		lbl_points.setText("Punkte: " + points);
 	}

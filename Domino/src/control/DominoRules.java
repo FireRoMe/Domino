@@ -333,6 +333,26 @@ public final class DominoRules
 		else
 			doublePoints[3] = false;
 	}
+	
+	public static int calculatePoints(int[] edgePoints, boolean[] doublePoints)
+	{
+		int points = 0;
+		int i = 0;
+		
+		for (int p: edgePoints)
+		{
+			if (doublePoints[i] == false)
+				points += p;
+			else
+			{
+				if (i != 0 && i != 1)
+					points += p*2;
+			}
+			
+			i++;
+		}
+		return points;
+	}
 
 	/**
 	 * Prueft, ob ein Stein von der Hand des Spielers auf dem Feld angelegt werden kann

@@ -374,21 +374,23 @@ public class DominoGame
 					// Es wird geprueft, ob der angeklickte Stein noch auf der Hand des Spielers ist
 					if (clickedStone.getParent().getName() == "Hand")
 					{
-						if (DominoRules.checkIfDroppable(stone, edgePoints, hasSpinner))
+						if (DominoRules.checkIfDroppable(stone, edgePoints, hasSpinner) && !allPlayers[currentPlayerIndex].isDropppedStone())
 						{
 							view.textOut("Kann gelegt werden");
 							view.dropFromHand(clickedStone, panelOffsetX, panelOffsetY);
 							stone.getPlayer().deleteStone(stone);
+							playedDominoes++;
+							allPlayers[currentPlayerIndex].setDropppedStone(true);
 							
-							if (playedDominoes == 0)
+							if (playedDominoes == 1)
 							{
 								clickedStone.setNotDraggable();
 								DominoRules.firstStone(stone, edgePoints);
 								hasSpinner = stone.isSpinner();
 								view.firstPoints(edgePoints);
 								view.updatePoints();
-								playedDominoes++;
 								
+								allPlayers[currentPlayerIndex].setDropppedStone(false);
 								currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
 								view.clearHand();
 								startRound();
@@ -487,6 +489,7 @@ public class DominoGame
 					}
 					
 					playedDominoes++;
+					allPlayers[currentPlayerIndex].setDropppedStone(false);
 					currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
 					
 					view.clearHand();
