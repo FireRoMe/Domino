@@ -7,7 +7,9 @@ public class Player
 	private ArrayList<Stone> hand = new ArrayList<Stone>();
 	private String name;
 	private boolean firstMove = true;
-	private boolean dropppedStone = false;
+	/** Wird benoetigt um festzustellen, ob ein Spieler bereits einen Stein aufs Feld gelegt hat*/
+	private boolean droppedStone = false;
+	private boolean blocked = false;
 	private int points;
 	
 	public Player(String name)
@@ -61,13 +63,23 @@ public class Player
 		return firstMove;
 	}
 
-	public boolean isDropppedStone()
+	public boolean isDroppedStone()
 	{
-		return dropppedStone;
+		return droppedStone;
 	}
 
-	public void setDropppedStone(boolean dropppedStone)
+	public void setDroppedStone(boolean droppedStone)
 	{
-		this.dropppedStone = dropppedStone;
+		this.droppedStone = droppedStone;
+	}
+
+	public boolean isBlocked()
+	{
+		return blocked;
+	}
+
+	public void setBlocked(boolean blocked)
+	{
+		this.blocked = blocked;
 	}
 }

@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -64,7 +67,7 @@ public class DominoGame
 		initializePlayers();
 		initializeHands();
 		initializeTalon();
-		view.initializeWindow(allStones, new MouseClickMotionListener());
+		view.initializeWindow(allStones, new MouseClickMotionListener(), new ButtonListener());
 		Player beginner = chooseBeginner();
 		view.textOut(beginner.getName());
 		
@@ -85,7 +88,30 @@ public class DominoGame
 	
 	private void startRound()
 	{
-		view.textOut("aktueller Spieler: " + allPlayers[currentPlayerIndex].getName());
+		Player player = allPlayers[currentPlayerIndex];
+		boolean blocked = false;
+		int failCounter = 0;
+		
+		player.setBlocked(false);
+		
+		for (Stone s: player.getHand())
+		{
+			if (!DominoRules.checkIfDroppable(s, edgePoints, spinner, playedDominoes))
+				failCounter++;
+		}
+		
+		if (failCounter == player.getHand().size())
+		{
+			blocked = true;
+			player.setBlocked(true);
+		}
+		
+		if (!talon.isEmpty() && blocked == true)
+			view.updateButton(true);
+		else
+			view.updateButton(false);
+		
+		view.textOut("aktueller Spieler: " + player.getName());
 		drawStonesOnView(currentPlayerIndex);
 	}
 
@@ -205,7 +231,7 @@ public class DominoGame
 		int playerID = 0;
 		
 		if (numPlayers == 2)
-			numStones = 10;
+			numStones = 7;
 		else
 			numStones = 5;
 		
@@ -380,13 +406,13 @@ public class DominoGame
 					if (clickedStoneLabel.getParent().getName() == "Hand")
 					{
 						if (DominoRules.checkIfDroppable(clickedStone, edgePoints, spinner, playedDominoes) && 
-															!allPlayers[currentPlayerIndex].isDropppedStone())
+															!allPlayers[currentPlayerIndex].isDroppedStone())
 						{
 							view.textOut("Kann gelegt werden");
 							view.dropFromHand(clickedStoneLabel, panelOffsetX, panelOffsetY);
 							clickedStone.getPlayer().deleteStone(clickedStone);
 							playedDominoes++;
-							allPlayers[currentPlayerIndex].setDropppedStone(true);
+							allPlayers[currentPlayerIndex].setDroppedStone(true);
 							
 							if (playedDominoes == 1)
 							{
@@ -398,11 +424,18 @@ public class DominoGame
 									spinner = clickedStone;
 								
 								view.firstPoints(edgePoints, doublePoints);
-								view.updatePoints(true);
+								int points = view.updatePoints(true);
 								
-								allPlayers[currentPlayerIndex].setDropppedStone(false);
-								currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
+								if (!DominoRules.calculatePlayerPoints(points, allPlayers[currentPlayerIndex]))
+									System.err.println("Schade, leider diesmal keine Punkte");
+								
+								System.err.println("Punkte " + allPlayers[currentPlayerIndex].getName() + ": " + allPlayers[currentPlayerIndex].getPoints());
+								view.updatePlayerPoints(allPlayers[currentPlayerIndex], currentPlayerIndex);
+								
+								allPlayers[currentPlayerIndex].setDroppedStone(false);
+								
 								view.clearHand();
+								currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
 								startRound();
 							}
 						}
@@ -520,10 +553,16 @@ public class DominoGame
 					}
 					
 					playedDominoes++;
-					allPlayers[currentPlayerIndex].setDropppedStone(false);
-					currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
+					allPlayers[currentPlayerIndex].setDroppedStone(false);
 					
+					if (!DominoRules.calculatePlayerPoints(edgePoints, doublePoints, allPlayers[currentPlayerIndex]))
+						System.err.println("Schade, leider diesmal keine Punkte");
+					
+					System.err.println("Punkte " + allPlayers[currentPlayerIndex].getName() + ": " + allPlayers[currentPlayerIndex].getPoints());
+					
+					view.updatePlayerPoints(allPlayers[currentPlayerIndex], currentPlayerIndex);
 					view.clearHand();
+					currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
 					startRound();
 				}
 				else
@@ -535,6 +574,23 @@ public class DominoGame
 			}
 			view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
 			view.textOut(doublePoints[0] + ", " + doublePoints[1] + ", " + doublePoints[2] + ", " + doublePoints[3]);
+		}
+	}
+	
+	public class ButtonListener	implements ActionListener 
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			Stone s = talon.get(0);
+			
+			talon.remove(s);
+			s.setPlayer(allPlayers[currentPlayerIndex]);
+			allPlayers[currentPlayerIndex].addStone(s);
+			view.addDominoeToHand(s, true);
+			
+			if (DominoRules.checkIfDroppable(s, edgePoints, spinner, playedDominoes))
+				view.updateButton(false);
 		}
 	}
 }

@@ -419,7 +419,7 @@ public final class DominoRules
 			i++;
 		}
 		
-		if (edgePoints[2] == 7 || edgePoints[3] == 7 && spinner != null)
+		if ((edgePoints[2] == 7 || edgePoints[3] == 7) && spinner != null)
 		{
 			if (spinner.getTopNeighbour() == null || spinner.getBottomNeighbour() == null)
 			{
@@ -451,5 +451,29 @@ public final class DominoRules
 			doublePoints[0] = true;
 			stone.setSpinner(true);
 		}
+	}
+	
+	public static boolean calculatePlayerPoints(int[] edgePoints, boolean[] doublePoints, Player player)
+	{
+		int points = calculatePoints(edgePoints, doublePoints, false);
+		
+		if (points % 5 == 0)
+		{
+			player.increasePoints(points);
+			return true;
+		}
+		
+		return false;
+	}
+
+	public static boolean calculatePlayerPoints(int points, Player player)
+	{
+		if (points % 5 == 0)
+		{
+			player.increasePoints(points);
+			return true;
+		}
+		
+		return false;
 	}
 }
