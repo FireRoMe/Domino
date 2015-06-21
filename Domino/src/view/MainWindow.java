@@ -65,7 +65,7 @@ public class MainWindow
 		scrollbar.setBounds(-2, 740, 1600, 135);
 		
 		JLabel lbl_help1 = new JLabel("Rechte Maustaste gedrueckt halten, um das Spielfeld zu verschieben");
-		JLabel lbl_help2 = new JLabel("Mit linker Maustaste auf eine freie Fläche klicken, um einen Stein zu ziehen");
+		JLabel lbl_help2 = new JLabel("Mit linker Maustaste auf eine freie Flï¿½che klicken, um einen Stein zu ziehen");
 		
 		contentPane.setLayout(null);
 		contentPane.setBounds(0, 0, 1600, 900);
@@ -89,12 +89,12 @@ public class MainWindow
 		
 		lbl_mouseX.setBounds(0, 0, 100, 20);
 		lbl_mouseY.setBounds(0, 20, 100, 20);
-		lbl_points.setBounds(contentPane.getWidth() - 77, 1, 70, 21);
+		lbl_points.setBounds(contentPane.getWidth() - 85, 1, 78, 21);
 		lbl_points.setIcon(new ImageIcon("ImageSrc/BG_Points.png"));
 		lbl_points.setIconTextGap(-65);
 		
-		lbl_player1Points.setBounds(contentPane.getWidth() - 82, 24, 70, 20);
-		lbl_player2Points.setBounds(contentPane.getWidth() - 82, 44, 70, 20);
+		lbl_player1Points.setBounds(contentPane.getWidth() - 90, 24, 78, 20);
+		lbl_player2Points.setBounds(contentPane.getWidth() - 90, 44, 78, 20);
 		
 		btn_drawTalon.setBounds(contentPane.getWidth() - 162, scrollbar.getY() - 40, 155, 40);
 		btn_drawTalon.addActionListener(buttonListener);
