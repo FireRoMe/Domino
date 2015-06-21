@@ -219,32 +219,40 @@ public final class DominoRules
 		}
 	}
 	
-	public static boolean checkSpinner(DominoLabel draggedStone, DominoLabel target, boolean hasSpinner)
+	public static Stone checkSpinner(DominoLabel draggedStone, DominoLabel target, boolean hasSpinner)
 	{
 		if (!hasSpinner && draggedStone.getStone().isDoublestone())
 		{
 			draggedStone.getStone().setSpinner(true);
-			return true;
+			return draggedStone.getStone();
 		}
 		else if (!hasSpinner && target.getStone().isDoublestone())
 		{
 			target.getStone().setSpinner(true);
-			return true;
+			return target.getStone();
 		}
-		else return false;
+		else 
+			return null;
 	}
 	
+	/**
+	 * Berechnet die Punkte, wenn ein Stein links angelegt wird
+	 * @param draggedStone - Der Stein, der angelegt wird
+	 * @param target - Der Stein, an den angelegt wird
+	 * @param edgePoints - Die Punkte, die vom Spiel übergeben werden
+	 * @param doublePoints - Gibt an, wo ein Doppelstein liegt
+	 */
 	public static void calculatePointsLeft(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
 	{
 		edgePoints[0] = draggedStone.getStone().getPips1();
 		if (draggedStone.getStone().isDoublestone())
 		{
 			doublePoints[0] = true;
-			if (edgePoints[2] == 0 && edgePoints[3] == 0)
-			{
-				edgePoints[2] = draggedStone.getStone().getPips1();
-				edgePoints[3] = draggedStone.getStone().getPips1();
-			}
+//			if (edgePoints[2] == 0 && edgePoints[3] == 0)
+//			{
+//				edgePoints[2] = draggedStone.getStone().getPips1();
+//				edgePoints[3] = draggedStone.getStone().getPips1();
+//			}
 		}
 		else
 			doublePoints[0] = false;
@@ -255,30 +263,37 @@ public final class DominoRules
 			if (target.getStone().isDoublestone())
 			{
 				doublePoints[1] = true;
-				if (edgePoints[2] == 0 && edgePoints[3] == 0)
-				{
-					edgePoints[2] = target.getStone().getPips2();
-					edgePoints[3] = target.getStone().getPips2();
-				}
+//				if (edgePoints[2] == 0 && edgePoints[3] == 0)
+//				{
+//					edgePoints[2] = target.getStone().getPips2();
+//					edgePoints[3] = target.getStone().getPips2();
+//				}
 			}
+			else
+				doublePoints[1] = false;
 		}
-		else
-			doublePoints[1] = false;
 	}
-
+	
+	/**
+	 * Berechnet die Punkte, wenn ein Stein rechts angelegt wird
+	 * @param draggedStone - Der Stein, der angelegt wird
+	 * @param target - Der Stein, an den angelegt wird
+	 * @param edgePoints - Die Punkte, die vom Spiel übergeben werden
+	 * @param doublePoints - Gibt an, wo ein Doppelstein liegt
+	 */
 	public static void calculatePointsRight(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
 	{
 		edgePoints[1] = draggedStone.getStone().getPips2();
 		if (draggedStone.getStone().isDoublestone())
 		{
 			doublePoints[1] = true;
-			if (edgePoints[2] == 0 && edgePoints[3] == 0)
-			{
-				edgePoints[2] = draggedStone.getStone().getPips2();
-				edgePoints[3] = draggedStone.getStone().getPips2();
-			}
+//			if (edgePoints[2] == 0 && edgePoints[3] == 0)
+//			{
+//				edgePoints[2] = draggedStone.getStone().getPips2();
+//				edgePoints[3] = draggedStone.getStone().getPips2();
+//			}
 		}
-		else
+		else 
 			doublePoints[1] = false;
 		
 		if (target.getStone().getLeftNeighbour() == null)
@@ -287,17 +302,24 @@ public final class DominoRules
 			if (target.getStone().isDoublestone())
 			{
 				doublePoints[0] = true;
-				if (edgePoints[2] == 0 && edgePoints[3] == 0)
-				{
-					edgePoints[2] = target.getStone().getPips2();
-					edgePoints[3] = target.getStone().getPips2();
-				}
+//				if (edgePoints[2] == 0 && edgePoints[3] == 0)
+//				{
+//					edgePoints[2] = target.getStone().getPips2();
+//					edgePoints[3] = target.getStone().getPips2();
+//				}
 			}
+			else
+				doublePoints[0] = false;
 		}
-		else
-			doublePoints[0] = false;
 	}
-
+	
+	/**
+	 * Berechnet die Punkte, wenn ein Stein unten angelegt wird
+	 * @param draggedStone - Der Stein, der angelegt wird
+	 * @param target - Der Stein, an den angelegt wird
+	 * @param edgePoints - Die Punkte, die vom Spiel übergeben werden
+	 * @param doublePoints - Gibt an, wo ein Doppelstein liegt
+	 */
 	public static void calculatePointsBottom(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
 	{
 		edgePoints[3] = draggedStone.getStone().getPips2();
@@ -311,11 +333,18 @@ public final class DominoRules
 			edgePoints[2] = target.getStone().getPips1();
 			if (target.getStone().isDoublestone() && !target.getStone().isSpinner())
 				doublePoints[2] = true;
+			else
+				doublePoints[2] = false;
 		}
-		else
-			doublePoints[2] = false;
 	}
-
+	
+	/**
+	 * Berechnet die Punkte, wenn ein Stein oben angelegt wird
+	 * @param draggedStone - Der Stein, der angelegt wird
+	 * @param target - Der Stein, an den angelegt wird
+	 * @param edgePoints - Die Punkte, die vom Spiel übergeben werden
+	 * @param doublePoints - Gibt an, wo ein Doppelstein liegt
+	 */
 	public static void calculatePointsTop(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
 	{
 		edgePoints[2] = draggedStone.getStone().getPips1();
@@ -324,32 +353,42 @@ public final class DominoRules
 		else
 			doublePoints[2] = false;
 		 
-		if (target.getStone().getBottomNeighbour() == null)
+		if (target.getStone().getBottomNeighbour() == null && !target.getStone().isSpinner())
 		{
 			edgePoints[3] = target.getStone().getPips2();
-			if (target.getStone().isDoublestone() && !target.getStone().isSpinner())
+			if (target.getStone().isDoublestone())
 				doublePoints[3] = true;
+			else
+				doublePoints[3] = false;
 		}
-		else
-			doublePoints[3] = false;
 	}
 	
-	public static int calculatePoints(int[] edgePoints, boolean[] doublePoints)
+	public static int calculatePoints(int[] edgePoints, boolean[] doublePoints, boolean firstStone)
 	{
 		int points = 0;
 		int i = 0;
 		
-		for (int p: edgePoints)
+		if (!firstStone)
 		{
-			if (doublePoints[i] == false)
-				points += p;
-			else
+			for (int p: edgePoints)
 			{
-				if (i != 0 && i != 1)
-					points += p*2;
+				if (p != 7)		// Wenn p eine 7 ist, wurde an diese Kante noch nicht angelegt. Meist oben oder unten
+				{
+					if (doublePoints[i] == false)
+						points += p;
+					else
+					{
+		//				if (i != 0 && i != 1)
+							points += p*2;
+					}
+				}
+				
+				i++;
 			}
-			
-			i++;
+		}
+		else
+		{
+			return edgePoints[0]+edgePoints[1];
 		}
 		return points;
 	}
@@ -361,23 +400,32 @@ public final class DominoRules
 	 * @return <b>true</b> - wenn der Stein gelegt werden kann <br>
 	 * <b>false</b> - wenn der Stein nicht gelegt werden kann
 	 */
-	public static boolean checkIfDroppable(Stone stone, int[] edgePoints, boolean hasSpinner)
+	public static boolean checkIfDroppable(Stone stone, int[] edgePoints, Stone spinner, int playedDominoes)
 	{
 		int i = 0;
 		
-		if (edgePoints[0] == 0 && edgePoints[1] == 0)
+		if (playedDominoes == 0)
 			return true;
 		
 		for (int points: edgePoints)
 		{
-			System.out.println("Spinner: " + hasSpinner + ", " + stone.getPips1() + ", " + stone.getPips2());
-			if (i > 1 && !hasSpinner)	// Wenn es keinen Spinner gibt muessen nicht alle Moeglichkeiten geprueft werden
+			System.out.println("Pruefstein: " + stone.getPips1() + ", " + stone.getPips2());
+			if (i > 1 && spinner == null)	// Wenn es keinen Spinner gibt muessen nicht alle Moeglichkeiten geprueft werden
 				break;
 			
 			if (points == stone.getPips1() || points == stone.getPips2())
 				return true;
 			
 			i++;
+		}
+		
+		if (edgePoints[2] == 7 || edgePoints[3] == 7 && spinner != null)
+		{
+			if (spinner.getTopNeighbour() == null || spinner.getBottomNeighbour() == null)
+			{
+				if (stone.getPips1() == spinner.getPips1() || stone.getPips2() == spinner.getPips1())
+					return true;
+			}
 		}
 		
 		return false;
@@ -393,19 +441,15 @@ public final class DominoRules
 			return ++currentPlayerIndex;
 	}
 
-	public static void firstStone(Stone stone, int[] edgePoints)
+	public static void firstStone(Stone stone, int[] edgePoints, boolean[] doublePoints)
 	{
+		edgePoints[0] = stone.getPips1();
+		edgePoints[1] = stone.getPips2();
+		
 		if (stone.isDoublestone())
 		{
-			edgePoints[2] = stone.getPips1();
-			edgePoints[3] = stone.getPips1();
-			
+			doublePoints[0] = true;
 			stone.setSpinner(true);
-		}
-		else
-		{
-			edgePoints[0] = stone.getPips1();
-			edgePoints[1] = stone.getPips2();
 		}
 	}
 }

@@ -33,6 +33,7 @@ public class DominoGame
 	 * [0]: links<br>[1]: rechts<br>[2]: oben<br>[3]: unten */
 	private boolean[] doublePoints = new boolean[4];
 	private boolean hasSpinner = false;
+	private Stone spinner = null;
 	/** Zaehlt, wieviele Steine bereits gelegt worden sind */
 	private int playedDominoes = 0;
 	private MainWindow view;
@@ -45,18 +46,20 @@ public class DominoGame
 	{
 		allPlayers = new Player[numPlayers];
 		
-		for (int e: edgePoints)
-			e = new Integer(0);
+		for (int i = 0; i < edgePoints.length; i++)
+			edgePoints[i] = 7;
 		
 		for (boolean b: doublePoints)
 			b = new Boolean(false);
 		
 		this.view = view;
+		view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
 		initializeGame();
 	}
 	
 	public void initializeGame()
 	{
+		view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
 		initializeDominoes();
 		initializePlayers();
 		initializeHands();
@@ -288,19 +291,20 @@ public class DominoGame
 					
 					if (d.isDraggable())
 					{
+						Point origin = view.getFrameCoordinates();
 						errorPoint = d.getLocation();
 						
 						draggedStone = d;
 						
-						if (!d.getStone().isDoublestone() && !d.getStone().isVertical())
+						if (!d.getStone().isDoublestone() && !d.getStone().isVertical())	// Wenn der Stein horizontal gedreht ist
 						{
-							offsetX = panelOffsetX + d.getWidth()/2 - 425;
-							offsetY = panelOffsetY + d.getHeight() - 280;
+							offsetX = panelOffsetX + d.getWidth()/2 - (origin.x + 102);
+							offsetY = panelOffsetY + d.getHeight() - (origin.y + 100);
 						}
-						else
+						else																// Wenn der Stein vertikal gedreht ist
 						{
-							offsetX = panelOffsetX + d.getWidth()/2 - 373;
-							offsetY = panelOffsetY + d.getHeight() - 353;
+							offsetX = panelOffsetX + d.getWidth()/2 - (origin.x + 52);
+							offsetY = panelOffsetY + d.getHeight() - (origin.y + 175);
 						}
 						
 						d.setLocation(offsetX + mouseX, offsetY + mouseY);
@@ -320,6 +324,7 @@ public class DominoGame
 				{
 					view.textOut("JPanel gedraggt");
 					JPanel p = (JPanel) e.getSource();
+					Point origin = view.getFrameCoordinates();
 					
 //					offsetX = p.getTopLevelAncestor().getX() + p.getWidth()/2;
 //					offsetY = p.getTopLevelAncestor().getY() + p.getHeight()/2;
@@ -329,7 +334,7 @@ public class DominoGame
 					view.textOut("OnScreen: " + p.getLocationOnScreen());
 					view.textOut("MausPos: " + mousePos.getLocation().x + "|" + mousePos.getLocation().y);
 					e.translatePoint(draggedAtX, draggedAtY);
-					p.setLocation(mouseX - draggedAtX, mouseY - draggedAtY);
+					p.setLocation(mouseX - (draggedAtX + origin.x) + 320, mouseY - (draggedAtY + origin.y) + 178);
 					
 					panelOffsetX = - p.getLocation().x;
 					panelOffsetY = - p.getLocation().y;
@@ -368,27 +373,32 @@ public class DominoGame
 				
 				if (c instanceof DominoLabel)
 				{
-					DominoLabel clickedStone = (DominoLabel) c;
-					Stone stone = clickedStone.getStone();
+					DominoLabel clickedStoneLabel = (DominoLabel) c;
+					Stone clickedStone = clickedStoneLabel.getStone();
 					
 					// Es wird geprueft, ob der angeklickte Stein noch auf der Hand des Spielers ist
-					if (clickedStone.getParent().getName() == "Hand")
+					if (clickedStoneLabel.getParent().getName() == "Hand")
 					{
-						if (DominoRules.checkIfDroppable(stone, edgePoints, hasSpinner) && !allPlayers[currentPlayerIndex].isDropppedStone())
+						if (DominoRules.checkIfDroppable(clickedStone, edgePoints, spinner, playedDominoes) && 
+															!allPlayers[currentPlayerIndex].isDropppedStone())
 						{
 							view.textOut("Kann gelegt werden");
-							view.dropFromHand(clickedStone, panelOffsetX, panelOffsetY);
-							stone.getPlayer().deleteStone(stone);
+							view.dropFromHand(clickedStoneLabel, panelOffsetX, panelOffsetY);
+							clickedStone.getPlayer().deleteStone(clickedStone);
 							playedDominoes++;
 							allPlayers[currentPlayerIndex].setDropppedStone(true);
 							
 							if (playedDominoes == 1)
 							{
-								clickedStone.setNotDraggable();
-								DominoRules.firstStone(stone, edgePoints);
-								hasSpinner = stone.isSpinner();
-								view.firstPoints(edgePoints);
-								view.updatePoints();
+								clickedStoneLabel.setNotDraggable();
+								DominoRules.firstStone(clickedStone, edgePoints, doublePoints);
+								hasSpinner = clickedStone.isSpinner();
+								
+								if (hasSpinner)
+									spinner = clickedStone;
+								
+								view.firstPoints(edgePoints, doublePoints);
+								view.updatePoints(true);
 								
 								allPlayers[currentPlayerIndex].setDropppedStone(false);
 								currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
@@ -401,18 +411,22 @@ public class DominoGame
 					}
 					
 					System.err.println("Yeah, ich habe auf ein DominoLabel geklickt!");
-					view.textOut("Stein " + stone.getPips1() + "|" + stone.getPips2() + " vertikal: " + stone.isVertical() + ", spinner: " + stone.isSpinner());
+					view.textOut("Stein " + clickedStone.getPips1() + "|" + clickedStone.getPips2() + " vertikal: " + clickedStone.isVertical() + ", spinner: " + clickedStone.isSpinner());
 				}
 				
 				else if (c instanceof JLabel)
 					view.textOut("Yeah, ich habe auf ein JLabel geklickt!");
 				
+				
 				if (c instanceof JPanel)
 				{
 					JPanel p = (JPanel) c;
 					
+					
 					if (p.getName() != "Hand")
 					{
+						// Nur für Debugging
+						/*
 						int index = allPlayers[0].getHand().size() - 1;
 						if (index >= 0)
 						{
@@ -421,11 +435,16 @@ public class DominoGame
 						}
 						else
 							view.textOut("Dieser Spieler hat keine Steine mehr");
+							
+						*/
 					}
+					
 					else
 						view.textOut("Man klickt nicht auf die Hand, das tut weh!");
 				}
 			}
+			view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
+			view.textOut(doublePoints[0] + ", " + doublePoints[1] + ", " + doublePoints[2] + ", " + doublePoints[3]);
 			
 			e.consume();			
 		}
@@ -433,7 +452,15 @@ public class DominoGame
 		@Override
 		public void mouseEntered(MouseEvent e)
 		{
-			// TODO Auto-generated method stub
+			if (e.getSource() instanceof DominoLabel)
+			{
+				DominoLabel label = (DominoLabel) e.getSource();
+				
+				if (label.getParent().getName() == "Hand")
+				{
+					view.textOut("" + DominoRules.checkIfDroppable(label.getStone(), edgePoints, spinner, playedDominoes));
+				}
+			}
 		}
 
 		@Override
@@ -481,8 +508,12 @@ public class DominoGame
 					
 					if (DominoRules.checkPossibleMove(target.getStone(), draggedStone, errorPoint))
 					{
-						if (DominoRules.checkSpinner(draggedStone, target, hasSpinner))
-							hasSpinner = true;
+						if (spinner == null)
+						{
+							spinner = DominoRules.checkSpinner(draggedStone, target, hasSpinner);
+							if (spinner != null)
+								hasSpinner = true;
+						}
 						
 						view.checkIntersection(draggedStone, true, edgePoints, doublePoints);
 						view.textOut("Target: " + target.getStone().getPips1() + "|" + target.getStone().getPips2());
@@ -501,10 +532,9 @@ public class DominoGame
 				}
 				
 				draggedStone = null;
-				
-				view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
-				view.textOut(doublePoints[0] + ", " + doublePoints[1] + ", " + doublePoints[2] + ", " + doublePoints[3]);
 			}
+			view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
+			view.textOut(doublePoints[0] + ", " + doublePoints[1] + ", " + doublePoints[2] + ", " + doublePoints[3]);
 		}
 	}
 }

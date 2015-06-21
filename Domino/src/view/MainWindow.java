@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.ScrollPane;
@@ -25,7 +24,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import data.Stone;
 import control.DominoGame.MouseClickMotionListener;
 import control.DominoRules;
@@ -54,13 +52,14 @@ public class MainWindow
 		contentPane = (JPanel) frame.getContentPane();
 
 		ScrollPane scrollbar = new ScrollPane();
-		scrollbar.setBounds(-2, 560, 1280, 135);
+//		scrollbar.setBounds(-2, 560, 1280, 135);
+		scrollbar.setBounds(-2, 740, 1600, 135);
 		
 		JLabel lbl_help1 = new JLabel("Rechte Maustaste gedrueckt halten, um das Spielfeld zu verschieben");
 		JLabel lbl_help2 = new JLabel("Mit linker Maustaste auf eine freie Fläche klicken, um einen Stein zu ziehen");
 		
 		contentPane.setLayout(null);
-		contentPane.setBounds(0, 0, 1280, 720);
+		contentPane.setBounds(0, 0, 1600, 900);
 		contentPane.add(lbl_mouseX);
 		contentPane.add(lbl_mouseY);
 		contentPane.add(lbl_points);
@@ -91,7 +90,7 @@ public class MainWindow
 		handPane.addMouseMotionListener(mouseHandler);
 		
 		graphicsPane.setBackground(Color.LIGHT_GRAY);
-		graphicsPane.setBounds(-1420, -580, 3200, 1800);
+		graphicsPane.setBounds(-960, -580, 3200, 1800);
 		graphicsPane.setLayout(null);
 		graphicsPane.addMouseListener(mouseHandler);
 		graphicsPane.addMouseMotionListener(mouseHandler);
@@ -176,8 +175,8 @@ public class MainWindow
 		String os = p.getProperty("os.name");
 
 		textOut("Aufloesung: " + (int) screen.getWidth() + "x" + (int) screen.getHeight());
-		int x = contentPane.getWidth() - (screen.width / 2);
-		int y = contentPane.getHeight() - (screen.height / 2);
+		int x = (screen.width / 2) - (contentPane.getWidth() / 2);
+		int y = (screen.height / 2) - (contentPane.getHeight() / 2);
 		textOut(os);
 		if(os.toLowerCase().contains("mac"))
 		{
@@ -322,9 +321,9 @@ public class MainWindow
 		lbl_mouseY.setSize(lbl_mouseY.getText().length() * 6, 20);
 	}
 	
-	public void updatePoints()
+	public void updatePoints(boolean firstStone)
 	{
-		int points = DominoRules.calculatePoints(lbl_points.getPoints(), lbl_points.getDoublePoints());
+		int points = DominoRules.calculatePoints(lbl_points.getPoints(), lbl_points.getDoublePoints(), firstStone);
 		
 		lbl_points.setText("Punkte: " + points);
 	}
@@ -518,7 +517,7 @@ public class MainWindow
 			
 			lbl_points.setPoints(edgePoints);
 			lbl_points.setDoublePoints(doublePoints);
-			updatePoints();
+			updatePoints(false);
 		}
 		else
 			textOut("Steine sind leider nicht kompatibel");
@@ -591,7 +590,7 @@ public class MainWindow
 			
 			lbl_points.setPoints(edgePoints);
 			lbl_points.setDoublePoints(doublePoints);
-			updatePoints();
+			updatePoints(false);
 		}
 	}
 	
@@ -600,6 +599,12 @@ public class MainWindow
 		contentPane.updateUI();
 		graphicsPane.updateUI();
 		handPane.updateUI();
+	}
+	
+	public Point getFrameCoordinates()
+	{
+		textOut(frame.getLocationOnScreen().x + "|" + frame.getLocationOnScreen().y);
+		return frame.getLocationOnScreen();
 	}
 
 	public void dropFromHand(DominoLabel draggedStone, int x, int y)
@@ -626,8 +631,9 @@ public class MainWindow
 		updatePanels();
 	}
 
-	public void firstPoints(int[] edgePoints)
+	public void firstPoints(int[] edgePoints, boolean[] doublePoints)
 	{
 		lbl_points.setPoints(edgePoints);
+		lbl_points.setDoublePoints(doublePoints);
 	}
 }
