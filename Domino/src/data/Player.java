@@ -10,6 +10,7 @@ public class Player
 	/** Wird benoetigt um festzustellen, ob ein Spieler bereits einen Stein aufs Feld gelegt hat*/
 	private boolean droppedStone = false;
 	private boolean blocked = false;
+	private boolean noStones = false;
 	private int points;
 	
 	public Player(String name)
@@ -26,6 +27,9 @@ public class Player
 	public void deleteStone(Stone stone)
 	{
 		hand.remove(stone);
+		
+		if (hand.isEmpty())
+			noStones = true;
 	}
 	
 	public ArrayList<Stone> getHand()
@@ -81,5 +85,15 @@ public class Player
 	public void setBlocked(boolean blocked)
 	{
 		this.blocked = blocked;
+	}
+	
+	public boolean isNoStones()
+	{
+		return noStones;
+	}
+	
+	public void resetNoStones()
+	{
+		noStones = false;
 	}
 }

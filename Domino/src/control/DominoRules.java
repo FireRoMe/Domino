@@ -1,6 +1,7 @@
 package control;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
 import data.Player;
 import data.Stone;
@@ -8,6 +9,13 @@ import view.DominoLabel;
 
 public final class DominoRules
 {
+	/** Ueberprueft die grundlegende Kompatibilitaet zweier Steine
+	 * 
+	 * @param dragged - Der Stein, der geprueft werden soll
+	 * @param target - Der Stein, der bereits auf dem Feld liegt
+	 * @return <b>true</b> - wenn kompatibel <br>
+	 * <b>false</b> - wenn nicht kompatibel
+	 */
 	public static boolean checkCompatibility(DominoLabel dragged, DominoLabel target)
 	{
 		int d_p1 = dragged.getStone().getPips1();
@@ -16,17 +24,7 @@ public final class DominoRules
 		int t_p2 = target.getStone().getPips2();
 		
 		if (d_p1 == t_p1 || d_p1 == t_p2 || d_p2 == t_p1 || d_p2 == t_p2)
-		{
-			if (!target.getStone().isDoublestone())
-			{
-				//TODO
-			}
-			else
-			{
-				//TODO
-			}
 			return true;
-		}
 		else
 			return false;
 	}
@@ -84,6 +82,24 @@ public final class DominoRules
 		}
 	}
 	
+	public static boolean checkNeighboursHorizontal(DominoLabel dragged, DominoLabel target, boolean snapRight)
+	{
+		if (snapRight)
+		{
+			if (target.getStone().getRightNeighbour() == null)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			if (target.getStone().getLeftNeighbour() == null)
+				return true;
+			else
+				return false;
+		}
+	}
+	
 	public static boolean snapTop(DominoLabel draggedStone, DominoLabel target)
 	{
 		Stone dStone = draggedStone.getStone();
@@ -121,6 +137,24 @@ public final class DominoRules
 			draggedStone.updateImage();
 			
 			return false;
+		}
+	}
+
+	public static boolean checkNeighboursVertical(DominoLabel draggedStone, DominoLabel target, boolean snapTop)
+	{
+		if (snapTop)
+		{
+			if (target.getStone().getTopNeighbour() == null)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			if (target.getStone().getBottomNeighbour() == null)
+				return true;
+			else
+				return false;
 		}
 	}
 	
@@ -475,5 +509,36 @@ public final class DominoRules
 		}
 		
 		return false;
+	}
+
+	public static int calculateRoundPoints(Player[] allPlayers)
+	{
+		int winner = 0;
+		int loser = 1;
+		
+		if (allPlayers[0].getHand().size() > allPlayers[1].getHand().size())
+		{
+			winner = 1;
+			loser = 0;
+		}
+		
+		int winnerPoints = calculateHandPoints(allPlayers[loser].getHand());
+		
+		allPlayers[winner].increasePoints(winnerPoints);
+		
+		return winner;
+	}
+
+	private static int calculateHandPoints(ArrayList<Stone> hand)
+	{
+		int points = 0;
+		
+		for (Stone s: hand)
+			points += s.getValue();
+		
+		while (points % 5 != 0)
+			points += 1;
+			
+		return points;
 	}
 }
