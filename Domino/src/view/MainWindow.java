@@ -107,7 +107,9 @@ public class MainWindow
 		
 		lbl_mouseX.setBounds(0, 0, 100, 20);
 		lbl_mouseY.setBounds(0, 20, 100, 20);
+
 		lbl_points.setBounds(contentPane.getWidth() - 89, 13, 70, 21);
+		lbl_points.setIcon(new ImageIcon("ImageSrc/BG_Points.png"));
 		lbl_points.setIconTextGap(-65);
 		
 		lbl_player1Points.setBounds(contentPane.getWidth() - 93, 45, 105, 20);
