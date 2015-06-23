@@ -7,17 +7,17 @@
       <Entity type="Class">
         <Name>Main</Name>
         <Access>Public</Access>
-        <Location left="1222" top="267" />
-        <Size width="162" height="216" />
+        <Location left="1440" top="288" />
+        <Size width="162" height="94" />
         <Collapsed>False</Collapsed>
-        <Member type="Method">public void Main()</Member>
+        <Member type="Method">public static void Main(String[] args)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>MainWindow</Name>
         <Access>Public</Access>
-        <Location left="1417" top="267" />
-        <Size width="245" height="791" />
+        <Location left="1608" top="288" />
+        <Size width="840" height="791" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int[] paintingComponent</Member>
         <Member type="Field">private int[] renderedImages</Member>
@@ -39,35 +39,35 @@
         <Member type="Field">private ScrollPane scrollPane</Member>
         <Member type="Field">private JPanel handPane</Member>
         <Member type="Field">private JPanel contentPane</Member>
-        <Member type="Method">public void initializeWindow()</Member>
-        <Member type="Method">private void prepareRender()</Member>
-        <Member type="Method">public void textOut()</Member>
-        <Member type="Method">public void showMousePosition()</Member>
-        <Member type="Method">public int updatePoints()</Member>
-        <Member type="Method">public void addDominoe()</Member>
-        <Member type="Method">public void addDominoeToHand()</Member>
-        <Member type="Method">public boolean checkIntersection()</Member>
+        <Member type="Method">public void initializeWindow(Stone[] allStones, MouseClickMotionListener mouseHandler, ButtonListener buttonListener)</Member>
+        <Member type="Method">private void prepareRender(Image img, double degrees, Dimension pos, Dimension size)</Member>
+        <Member type="Method">public void textOut(String s)</Member>
+        <Member type="Method">public void showMousePosition(int x, int y)</Member>
+        <Member type="Method">public int updatePoints(boolean firstStone)</Member>
+        <Member type="Method">public void addDominoe(Stone s, Point p)</Member>
+        <Member type="Method">public void addDominoeToHand(Stone s, boolean firstMove)</Member>
+        <Member type="Method">public boolean checkIntersection(DominoLabel draggedStone, boolean released, int[] edgePoints, boolean[] doublePoints)</Member>
         <Member type="Method">public DominoLabel getCurrentTarget()</Member>
-        <Member type="Method">private boolean moveStoneHorizontal()</Member>
-        <Member type="Method">private boolean moveStoneVertical()</Member>
+        <Member type="Method">private boolean moveStoneHorizontal(DominoLabel draggedStone, DominoLabel target, ArrayList&lt;Boolean&gt; intersectionColors, int[] edgePoints, boolean[] doublePoints)</Member>
+        <Member type="Method">private boolean moveStoneVertical(DominoLabel draggedStone, DominoLabel target, ArrayList&lt;Boolean&gt; intersectionColors, int[] edgePoints, boolean[] doublePoints)</Member>
         <Member type="Method">public void updatePanels()</Member>
         <Member type="Method">public Point getFrameCoordinates()</Member>
-        <Member type="Method">public void dropFromHand()</Member>
+        <Member type="Method">public void dropFromHand(DominoLabel clickedStone, int offsetX, int offsetY, int playedDominoes)</Member>
         <Member type="Method">public void clearHand()</Member>
-        <Member type="Method">public void firstPoints()</Member>
-        <Member type="Method">public void updateButton()</Member>
-        <Member type="Method">public void updatePlayerPoints()</Member>
-        <Member type="Method">public void updatePlayerArrow()</Member>
+        <Member type="Method">public void firstPoints(int[] edgePoints, boolean[] doublePoints)</Member>
+        <Member type="Method">public void updateButton(boolean isActive, String text)</Member>
+        <Member type="Method">public void updatePlayerPoints(Player player, int playerIndex)</Member>
+        <Member type="Method">public void updatePlayerArrow(int playerIndex, int playedDominoes)</Member>
         <Member type="Method">public void resetWindow()</Member>
         <Member type="Method">public void updateSplashLabels()</Member>
-        <Member type="Method">public void delay()</Member>
+        <Member type="Method">public void delay(int milliseconds)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>DominoGame</Name>
         <Access>Public</Access>
-        <Location left="78" top="267" />
-        <Size width="286" height="434" />
+        <Location left="355" top="288" />
+        <Size width="240" height="451" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Stone[] allStones</Member>
         <Member type="Field">private ArrayList&lt;Stone&gt; talon</Member>
@@ -80,6 +80,7 @@
         <Member type="Field">private int playedDominoes</Member>
         <Member type="Field">private int round</Member>
         <Member type="Field">private MainWindow view</Member>
+        <Member type="Method">public void initializeGame()</Member>
         <Member type="Method">private void startMove()</Member>
         <Member type="Method">private void endRound()</Member>
         <Member type="Method">private void resetRound()</Member>
@@ -89,14 +90,14 @@
         <Member type="Method">private void initializePlayers()</Member>
         <Member type="Method">private void initializeHands()</Member>
         <Member type="Method">private void initializeTalon()</Member>
-        <Member type="Method">private void drawStonesOnView()</Member>
+        <Member type="Method">private void drawStonesOnView(int PlayerIndex)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>Player</Name>
         <Access>Public</Access>
-        <Location left="386" top="265" />
-        <Size width="263" height="468" />
+        <Location left="606" top="288" />
+        <Size width="267" height="468" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private ArrayList&lt;Stone&gt; hand</Member>
         <Member type="Field">private String name</Member>
@@ -105,20 +106,20 @@
         <Member type="Field">private boolean blocked</Member>
         <Member type="Field">private boolean noStones</Member>
         <Member type="Field">private int points</Member>
-        <Member type="Method">public String Player()</Member>
-        <Member type="Method">public void addStone()</Member>
-        <Member type="Method">public void deleteStone()</Member>
+        <Member type="Method">public String Player(String name)</Member>
+        <Member type="Method">public void addStone(Stone stone)</Member>
+        <Member type="Method">public void deleteStone(Stone stone)</Member>
         <Member type="Method">public ArrayList&lt;Stone&gt; getHand()</Member>
         <Member type="Method">public String getName()</Member>
-        <Member type="Method">public void increasePoints()</Member>
+        <Member type="Method">public void increasePoints(int points)</Member>
         <Member type="Method">public int getPoints()</Member>
-        <Member type="Method">public Stone placeStone()</Member>
-        <Member type="Method">public void setfirstMove()</Member>
+        <Member type="Method">public Stone placeStone(Stone s)</Member>
+        <Member type="Method">public void setfirstMove(boolean isFirstMove)</Member>
         <Member type="Method">public boolean isFirstMove()</Member>
         <Member type="Method">public boolean isDroppedStone()</Member>
-        <Member type="Method">public void NewMethod()</Member>
+        <Member type="Method">public void setDroppedStone(boolean droppedStone)</Member>
         <Member type="Method">public boolean isBlocked()</Member>
-        <Member type="Method">public void setBlocked()</Member>
+        <Member type="Method">public void setBlocked(boolean blocked)</Member>
         <Member type="Method">public boolean isNoStones()</Member>
         <Member type="Method">public void resetNoStones()</Member>
         <Modifier>None</Modifier>
@@ -126,8 +127,8 @@
       <Entity type="Class">
         <Name>Stone</Name>
         <Access>Public</Access>
-        <Location left="679" top="267" />
-        <Size width="245" height="791" />
+        <Location left="880" top="288" />
+        <Size width="381" height="791" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int pips1</Member>
         <Member type="Field">private int pips2</Member>
@@ -145,7 +146,7 @@
         <Member type="Field">private Player player</Member>
         <Member type="Field">private boolean rotated</Member>
         <Member type="Method">public void loadIcon()</Member>
-        <Member type="Method">public void rotateImage()</Member>
+        <Member type="Method">public void rotateImage(int angle)</Member>
         <Member type="Method">public void resizeImage()</Member>
         <Member type="Method">public int getPips1()</Member>
         <Member type="Method">public int getPips2()</Member>
@@ -154,30 +155,30 @@
         <Member type="Method">public boolean isDoublestone()</Member>
         <Member type="Method">private void setDoublestone()</Member>
         <Member type="Method">public Image getIcon()</Member>
-        <Member type="Method">public void setPlayer()</Member>
-        <Member type="Method">public boolean checkRotationHorizontal()</Member>
-        <Member type="Method">public boolean checkRotationVertical()</Member>
+        <Member type="Method">public void setPlayer(Player p)</Member>
+        <Member type="Method">public boolean checkRotationHorizontal(Stone target, boolean snapRight)</Member>
+        <Member type="Method">public boolean checkRotationVertical(Stone target, boolean snapTop)</Member>
         <Member type="Method">private void togglePips()</Member>
         <Member type="Method">public Stone getLeftNeighbour()</Member>
-        <Member type="Method">public void setLeftNeighbour()</Member>
+        <Member type="Method">public void setLeftNeighbour(Stone s)</Member>
         <Member type="Method">public Stone getRightNeighbour()</Member>
-        <Member type="Method">public void setRightNeighbour()</Member>
+        <Member type="Method">public void setRightNeighbour(Stone s)</Member>
         <Member type="Method">public Stone getTopNeighbour()</Member>
-        <Member type="Method">public void setTopNeighbour()</Member>
+        <Member type="Method">public void setTopNeighbour(Stone s)</Member>
         <Member type="Method">public Stone getBottomNeighbour()</Member>
-        <Member type="Method">public void setBottomNeighbour()</Member>
+        <Member type="Method">public void setBottomNeighbour(Stone s)</Member>
         <Member type="Method">public void clearNeighbours()</Member>
-        <Member type="Method">public void setSpinner()</Member>
+        <Member type="Method">public void setSpinner(boolean isSpinner)</Member>
         <Member type="Method">public boolean isSpinner()</Member>
-        <Member type="Method">public void setVertical()</Member>
+        <Member type="Method">public void setVertical(boolean isVertical)</Member>
         <Member type="Method">public boolean isVertical()</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>DominoLabel</Name>
         <Access>Public</Access>
-        <Location left="945" top="265" />
-        <Size width="254" height="319" />
+        <Location left="1270" top="288" />
+        <Size width="162" height="179" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Stone stone</Member>
         <Member type="Field">private boolean draggable</Member>
@@ -190,7 +191,7 @@
       <Entity type="Class">
         <Name>RenderImage</Name>
         <Access>Public</Access>
-        <Location left="1707" top="272" />
+        <Location left="2459" top="288" />
         <Size width="230" height="213" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Image img</Member>
@@ -206,30 +207,30 @@
       <Entity type="Class">
         <Name>DominoRules</Name>
         <Access>Public</Access>
-        <Location left="1972" top="271" />
-        <Size width="256" height="434" />
+        <Location left="2698" top="288" />
+        <Size width="631" height="434" />
         <Collapsed>False</Collapsed>
-        <Member type="Method">public static boolean checkCompatibility()</Member>
-        <Member type="Method">public static boolean snapRight()</Member>
-        <Member type="Method">public static boolean checkNeighboursHorizontal()</Member>
-        <Member type="Method">public static boolean snapTop()</Member>
-        <Member type="Method">public static boolean checkNeighboursVertical()</Member>
-        <Member type="Method">private static int giveEqualPip()</Member>
-        <Member type="Method">public static boolean checkIfVertical()</Member>
-        <Member type="Method">public static boolean checkPossibleMove()</Member>
-        <Member type="Method">public static Stone checkSpinner()</Member>
-        <Member type="Method">public static void calculatePointsLeft()</Member>
-        <Member type="Method">public static void calculatePointsRight()</Member>
-        <Member type="Method">public static void calculatePointsBottom()</Member>
-        <Member type="Method">public static void calculatePointsTop()</Member>
-        <Member type="Method">public static int calculatePoints()</Member>
-        <Member type="Method">public static boolean checkIfDroppable()</Member>
-        <Member type="Method">public static int switchPlayer()</Member>
-        <Member type="Method">public static void firstStone()</Member>
-        <Member type="Method">public static boolean calculatePlayerPoints()</Member>
-        <Member type="Method">public static boolean calculatePlayerPoints()</Member>
-        <Member type="Method">public static int calculateRoundPoints()</Member>
-        <Member type="Method">public static int calculateHandPoints()</Member>
+        <Member type="Method">public static boolean checkCompatibility(DominoLabel dragged, DominoLabel target)</Member>
+        <Member type="Method">public static boolean snapRight(DominoLabel draggedStone, DominoLabel target)</Member>
+        <Member type="Method">public static boolean checkNeighboursHorizontal(DominoLabel dragged, DominoLabel target, boolean snapRight)</Member>
+        <Member type="Method">public static boolean snapTop(DominoLabel draggedStone, DominoLabel target)</Member>
+        <Member type="Method">public static boolean checkNeighboursVertical(DominoLabel draggedStone, DominoLabel target, boolean snapTop)</Member>
+        <Member type="Method">private static int giveEqualPip(Stone dragged, Stone target)</Member>
+        <Member type="Method">public static boolean checkIfVertical(DominoLabel target)</Member>
+        <Member type="Method">public static boolean checkPossibleMove(Stone target, DominoLabel draggedStone, Point errorPoint)</Member>
+        <Member type="Method">public static Stone checkSpinner(DominoLabel draggedStone, DominoLabel target, boolean hasSpinner)</Member>
+        <Member type="Method">public static void calculatePointsLeft(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)</Member>
+        <Member type="Method">public static void calculatePointsRight(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)</Member>
+        <Member type="Method">public static void calculatePointsBottom(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)</Member>
+        <Member type="Method">public static void calculatePointsTop(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)</Member>
+        <Member type="Method">public static int calculatePoints(int[] edgePoints, boolean[] doublePoints, boolean firstStone)</Member>
+        <Member type="Method">public static boolean checkIfDroppable(Stone stone, int[] edgePoints, Stone spinner, int playedDominoes)</Member>
+        <Member type="Method">public static int switchPlayer(Player[] allPlayers, int currentPlayerIndex)</Member>
+        <Member type="Method">public static void firstStone(Stone stone, int[] edgePoints, boolean[] doublePoints)</Member>
+        <Member type="Method">public static boolean calculatePlayerPoints(int[] edgePoints, boolean[] doublePoints, Player player)</Member>
+        <Member type="Method">public static boolean calculatePlayerPoints(int points, Player player)</Member>
+        <Member type="Method">public static int calculateRoundPoints(Player[] allPlayers)</Member>
+        <Member type="Method">public static int calculateHandPoints(ArrayList&lt;Stone&gt; hand)</Member>
         <Modifier>None</Modifier>
       </Entity>
     </Entities>
