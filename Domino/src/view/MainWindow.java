@@ -94,17 +94,16 @@ public class MainWindow
 		lbl_help2.setBounds(575, 25, 450, 20);
 		lbl_help2.setHorizontalAlignment(JLabel.CENTER);
 		
-		lbl_splash1.setBounds(0, (contentPane.getHeight()/2) - 100, contentPane.getWidth(), 100);
+		lbl_splash1.setBounds(0, (contentPane.getHeight()/2) - 200, contentPane.getWidth(), 100);
 		lbl_splash1.setHorizontalAlignment(JLabel.CENTER);
 		lbl_splash1.setFont(lbl_splash1.getFont().deriveFont(100.0f));
 		lbl_splash1.setText("Let's play Domino!");
 
-		lbl_splash2.setBounds(0, (contentPane.getHeight()/2) - 150, contentPane.getWidth(), 150);
+		lbl_splash2.setBounds(0, (contentPane.getHeight()/2) -100, contentPane.getWidth(), 150);
 		lbl_splash2.setHorizontalAlignment(JLabel.CENTER);
 		lbl_splash2.setFont(lbl_splash1.getFont().deriveFont(100.0f));
 //		lbl_splash2.setText("Let's play Domino!");
 
-		
 		lbl_mouseX.setBounds(0, 0, 100, 20);
 		lbl_mouseY.setBounds(0, 20, 100, 20);
 
@@ -610,7 +609,7 @@ public class MainWindow
 					else
 					{
 						System.err.println("Normalen Stein vertikal oben an Doppelstein angelegt");
-						draggedStone.setLocation(tPosX+(draggedHeight/2), tPosY-draggedHeight*2);
+						draggedStone.setLocation(tPosX+(draggedWidth/2), tPosY-draggedHeight);
 					}
 				}
 				else
@@ -759,7 +758,7 @@ public class MainWindow
 		{
 			if (lbl_player1Points.getIcon() == null)
 			{
-				lbl_player1Points.setIcon(arrow);
+				lbl_player1Points.setIcon(arrow);			// TODO warum verschiebt der die Labels
 				lbl_player1Points.setLocation(x1 - 24, y1);
 				lbl_player2Points.setIcon(null);
 				
@@ -793,36 +792,80 @@ public class MainWindow
 		updatePanels();
 	}
 	
-	public void updateSplashLabels()
+	public void updateSplashLabels(String label1, String label2, Color textColor, int maxTextSize, int delay)
 	{
-		int fontSize = 0;
+		updateButton(false, "");
+		
+		int fontSize1 = 20;
+		int fontSize2 = 20;
+		
+		lbl_splash1.setVisible(true);
+		lbl_splash2.setVisible(true);
+		
+		lbl_splash1.setText(label1);
+		lbl_splash2.setText(label2);
+		lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize1));
+		lbl_splash2.setFont(lbl_splash2.getFont().deriveFont((float)fontSize2));
+		
+		if (textColor != null)
+		{
+			lbl_splash1.setForeground(textColor);
+			lbl_splash2.setForeground(textColor);
+		}
+		
 		
 		for (int i = 0; i <= 255; i++)
 		{
-			textOut("" + i);
-			lbl_splash1.setForeground(new Color(255,0,0,i));
-			if (i % 3 == 0)
-				fontSize++;
+			if (lbl_splash1.getForeground() != textColor)
+				lbl_splash1.setForeground(new Color(255 - i,(i/2),(i/4),i));
 				
-			lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize));
+			if (i % 3 == 0 && fontSize1 < maxTextSize)
+				fontSize1++;
+			
+			lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize1));
 			
 			delay(5);
 		}
 		
-		delay(2000);
+		delay(delay);
+		
+		if (label2 != "")
+		{
+			for (int i = 0; i <= 255; i++)
+			{
+				if (lbl_splash2.getForeground() != textColor)
+					lbl_splash2.setForeground(new Color(0,0,0));
+					
+				if (i % 3 == 0 && fontSize2 < maxTextSize)
+					fontSize2++;
+					
+				lbl_splash2.setFont(lbl_splash2.getFont().deriveFont((float)fontSize2));
+				
+				delay(5);
+			}
+			
+			delay(750);
+		}
 		
 		for (int i = 255; i >= 0; i--)
 		{
-			textOut("" + i);
-			lbl_splash1.setForeground(new Color(255,0,0,i));
-			if (i % 3 == 0)
-				fontSize--;
+			lbl_splash1.setForeground(new Color(255 - i,(i/2),(i/4),i));
+			if (i % 3 == 0 && fontSize1 >= 0)
+			{
+				fontSize1--;
+				fontSize2--;
+			}
 				
-			lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize));
+			lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize1));
+			lbl_splash2.setFont(lbl_splash1.getFont().deriveFont((float)fontSize2));
 			
 			delay(1);
 		}
 		lbl_splash1.setVisible(false);
+		lbl_splash2.setVisible(false);
+		
+		if (textColor == null)
+			delay(500);
 	}
 	
 	public void delay(int milliseconds)

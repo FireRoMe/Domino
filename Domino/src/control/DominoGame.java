@@ -1,5 +1,6 @@
 package control;
 
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.MouseInfo;
@@ -75,9 +76,9 @@ public class DominoGame
 		initializeTalon();
 		view.initializeWindow(allStones, new MouseClickMotionListener(), new ButtonListener());
 		currentPlayerIndex = chooseBeginner();
-		view.textOut(allPlayers[currentPlayerIndex].getName() + " faengt an!");
 		
-		view.updateSplashLabels();
+		view.updateSplashLabels("Let's play Domino", "", null, 100, 1500);
+		view.updateSplashLabels("Runde 1", "Spieler " + (currentPlayerIndex+1) + " beginnt", new Color(0,0,0), 60, 500);
 		startMove();
 	}
 	
@@ -123,21 +124,28 @@ public class DominoGame
 	
 	private void endRound()
 	{
-		int winner = DominoRules.calculateRoundPoints(allPlayers);
+		int winnerPoints = DominoRules.calculateRoundPoints(allPlayers, true);
+		int winner = DominoRules.calculateRoundPoints(allPlayers, false);
 		view.updatePlayerPoints(allPlayers[winner], winner);
 		
-		view.textOut("Gewinner: " + allPlayers[winner].getName());
+		String winnerString = "Spieler " + winner + " gewinnt die Runde";
+		String pointsString = "und erhält " + winnerPoints + " Punkte";
+		
+		view.updateSplashLabels(winnerString, pointsString, null, 60, 500);
 		
 		if (allPlayers[winner].getPoints() < 250)
 		{
 			resetRound();
-
+			
 			initializeDominoes();
 			initializeHands();
 			initializeTalon();
+			currentPlayerIndex = chooseBeginner();
 			
 			round++;
 			
+			String beginner =  "Spieler " + (currentPlayerIndex+1) + " beginnt";
+			view.updateSplashLabels("Runde " + round, beginner, new Color(0,0,0), 60, 500);
 			startMove();
 		}
 	}
@@ -295,7 +303,7 @@ public class DominoGame
 		int playerID = 0;
 		
 		if (numPlayers == 2)
-			numStones = 5;
+			numStones = 7;
 		else
 			numStones = 5;
 		
@@ -591,6 +599,8 @@ public class DominoGame
 		@Override
 		public void mouseReleased(MouseEvent e)
 		{
+			boolean endRound = false;
+			
 			if (e.getSource() instanceof JPanel)
 			{
 				JPanel p = (JPanel) e.getSource();
@@ -638,7 +648,9 @@ public class DominoGame
 						
 						// wenn ein Spieler keine Steine mehr hat, endet die Runde
 						if (allPlayers[currentPlayerIndex].isNoStones())
-							endRound();
+						{
+							endRound = true;
+						}
 						else
 						{
 							currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
@@ -661,6 +673,9 @@ public class DominoGame
 			}
 			view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
 			view.textOut(doublePoints[0] + ", " + doublePoints[1] + ", " + doublePoints[2] + ", " + doublePoints[3]);
+			
+			if (endRound == true)
+				endRound();
 		}
 	}
 	

@@ -511,7 +511,7 @@ public final class DominoRules
 		return false;
 	}
 
-	public static int calculateRoundPoints(Player[] allPlayers)
+	public static int calculateRoundPoints(Player[] allPlayers, boolean returnPoints)
 	{
 		int winner = 0;
 		int loser = 1;
@@ -524,9 +524,13 @@ public final class DominoRules
 		
 		int winnerPoints = calculateHandPoints(allPlayers[loser].getHand());
 		
-		allPlayers[winner].increasePoints(winnerPoints);
-		
-		return winner;
+		if (returnPoints)
+			return winnerPoints;
+		else
+		{
+			allPlayers[winner].increasePoints(winnerPoints);
+			return winner;
+		}
 	}
 
 	private static int calculateHandPoints(ArrayList<Stone> hand)
