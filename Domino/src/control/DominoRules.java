@@ -38,38 +38,48 @@ public final class DominoRules
 	 */
 	public static boolean snapRight(DominoLabel draggedStone, DominoLabel target)
 	{
+		// Steine aus den DominoLabeln holen
 		Stone dStone = draggedStone.getStone();
 		Stone tStone = target.getStone();
+		// Es wird geprueft, welche Seite des Zielsteins mit dem zu legenden Stein uebereinstimmt
 		int equalPip = giveEqualPip(dStone, tStone);
 		
+		// wenn das Ziel ein Doppelstein ist
 		if (equalPip == 0)
 		{
+			// wenn das Ziel rechts keinen Nachbarn hat
 			if (tStone.getRightNeighbour() == null)
 			{
+				// wird geprueft, ob der Stein gedreht werden muss
 				dStone.checkRotationHorizontal(tStone, true);
-				draggedStone.updateImage();
+				draggedStone.updateImage();	// das Bild des Labels wird aktualisiert
 				
-				return true;
+				return true;	// der Stein kann rechts angelegt werden
 			}
+			// das Ziel hat rechts einen Nachbarn
 			else
 			{
 				dStone.checkRotationHorizontal(tStone, false);
 				draggedStone.updateImage();
 				
-				return false;
+				return false;	// der Stein kann links angelegt werden
 			}
 		}
 		
+		// wenn das Ziel rechts keinen Nachbarn hat und die uebereinstimmende Augenzahl
+		// auf rechten Seite des Zielsteins ist 
 		if(tStone.getRightNeighbour() == null && equalPip == 2)
 		{
+			// wenn der anzulegende Stein falsch gedreht ist, muss er gedreht werden
 			if (tStone.getPips2() != dStone.getPips1())
 			{
 				dStone.checkRotationHorizontal(target.getStone(), true);
 				draggedStone.updateImage();
 			}
 			
-			return true;
+			return true;	// der Stein kann rechts angelegt werden
 		}	
+		// sonst soll links angelegt werden
 		else
 		{
 			if (tStone.getPips1() != dStone.getPips2())
@@ -78,7 +88,7 @@ public final class DominoRules
 				draggedStone.updateImage();
 			}
 			
-			return false;
+			return false;	// der Stein kann links angelegt werden
 		}
 	}
 	
@@ -182,6 +192,7 @@ public final class DominoRules
 	{
 		Stone tStone = target.getStone();
 		
+		// TODO Debug ausgabe löschen
 		if (tStone.getLeftNeighbour() != null && tStone.getRightNeighbour() != null)
 		{
 			System.err.println("checkIFVertical: \n\r"

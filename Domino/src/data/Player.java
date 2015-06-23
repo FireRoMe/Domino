@@ -11,7 +11,7 @@ public class Player
 	private boolean droppedStone = false;
 	private boolean blocked = false;
 	private boolean noStones = false;
-	private int points;
+	private int points = 0;
 	
 	public Player(String name)
 	{

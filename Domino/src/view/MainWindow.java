@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -97,12 +99,10 @@ public class MainWindow
 		lbl_splash1.setBounds(0, (contentPane.getHeight()/2) - 200, contentPane.getWidth(), 100);
 		lbl_splash1.setHorizontalAlignment(JLabel.CENTER);
 		lbl_splash1.setFont(lbl_splash1.getFont().deriveFont(100.0f));
-		lbl_splash1.setText("Let's play Domino!");
 
 		lbl_splash2.setBounds(0, (contentPane.getHeight()/2) -100, contentPane.getWidth(), 150);
 		lbl_splash2.setHorizontalAlignment(JLabel.CENTER);
 		lbl_splash2.setFont(lbl_splash1.getFont().deriveFont(100.0f));
-//		lbl_splash2.setText("Let's play Domino!");
 
 		lbl_mouseX.setBounds(0, 0, 100, 20);
 		lbl_mouseY.setBounds(0, 20, 100, 20);
@@ -634,13 +634,13 @@ public class MainWindow
 					else
 					{
 						System.err.println("Normalen Stein vertikal unten an Doppelstein angelegt");
-						draggedStone.setLocation(tPosX+(draggedHeight/2), tPosY+draggedHeight);
+						draggedStone.setLocation(tPosX+(draggedWidth/2), tPosY+targetHeight);
 					}
 				}
 				else
 				{
 					System.err.println("Doppelstein unten angelegt");
-					draggedStone.setLocation(tPosX-(targetWidth/2), tPosY+draggedWidth*2);
+					draggedStone.setLocation(tPosX-(targetWidth/2), tPosY+targetHeight);
 				}
 				
 				target.getStone().setBottomNeighbour(draggedStone.getStone());
@@ -792,34 +792,23 @@ public class MainWindow
 		updatePanels();
 	}
 	
-	public void updateSplashLabels(String label1, String label2, Color textColor, int maxTextSize, int delay)
+	public void updateSplashLabels()
 	{
+		Timer t = new Timer(true);
 		updateButton(false, "");
 		
-		int fontSize1 = 20;
-		int fontSize2 = 20;
+		int fontSize1 = 0;
 		
 		lbl_splash1.setVisible(true);
-		lbl_splash2.setVisible(true);
 		
-		lbl_splash1.setText(label1);
-		lbl_splash2.setText(label2);
+		lbl_splash1.setText("Let's play Domino");
 		lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize1));
-		lbl_splash2.setFont(lbl_splash2.getFont().deriveFont((float)fontSize2));
-		
-		if (textColor != null)
-		{
-			lbl_splash1.setForeground(textColor);
-			lbl_splash2.setForeground(textColor);
-		}
-		
 		
 		for (int i = 0; i <= 255; i++)
 		{
-			if (lbl_splash1.getForeground() != textColor)
-				lbl_splash1.setForeground(new Color(255 - i,(i/2),(i/4),i));
+			lbl_splash1.setForeground(new Color(255 - i,(i/2),(i/4),i));
 				
-			if (i % 3 == 0 && fontSize1 < maxTextSize)
+			if (i % 3 == 0 && fontSize1 < 100)
 				fontSize1++;
 			
 			lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize1));
@@ -827,25 +816,7 @@ public class MainWindow
 			delay(5);
 		}
 		
-		delay(delay);
-		
-		if (label2 != "")
-		{
-			for (int i = 0; i <= 255; i++)
-			{
-				if (lbl_splash2.getForeground() != textColor)
-					lbl_splash2.setForeground(new Color(0,0,0));
-					
-				if (i % 3 == 0 && fontSize2 < maxTextSize)
-					fontSize2++;
-					
-				lbl_splash2.setFont(lbl_splash2.getFont().deriveFont((float)fontSize2));
-				
-				delay(5);
-			}
-			
-			delay(750);
-		}
+		delay(1500);
 		
 		for (int i = 255; i >= 0; i--)
 		{
@@ -853,19 +824,46 @@ public class MainWindow
 			if (i % 3 == 0 && fontSize1 >= 0)
 			{
 				fontSize1--;
-				fontSize2--;
 			}
 				
 			lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize1));
-			lbl_splash2.setFont(lbl_splash1.getFont().deriveFont((float)fontSize2));
 			
 			delay(1);
 		}
 		lbl_splash1.setVisible(false);
-		lbl_splash2.setVisible(false);
 		
-		if (textColor == null)
-			delay(500);
+		delay(300);
+	}
+	
+	public void showGameInfo(final String text1, final String text2, final float textSize, int delay)
+	{
+		Timer t = new Timer(true);
+		
+		t.schedule(new TimerTask()
+		{
+			@Override
+			public void run()
+			{
+				lbl_splash1.setFont(lbl_splash1.getFont().deriveFont(textSize));
+				lbl_splash2.setFont(lbl_splash2.getFont().deriveFont(textSize));
+				lbl_splash1.setForeground(Color.BLACK);
+				lbl_splash2.setForeground(Color.BLACK);
+				lbl_splash1.setText(text1);
+				lbl_splash2.setText(text2);
+				lbl_splash1.setVisible(true);
+				lbl_splash2.setVisible(true);
+			}
+		}, delay);
+		
+		t.schedule(new TimerTask()
+		{
+			@Override
+			public void run()
+			{
+				lbl_splash1.setVisible(false);
+				lbl_splash2.setVisible(false);
+			}
+		}, delay + 2000);
 	}
 	
 	public void delay(int milliseconds)

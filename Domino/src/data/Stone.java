@@ -43,19 +43,17 @@ public class Stone
 	{
 		BufferedImage image;
 		
-		//String fileName = new String("ImageSrc/transparenzTest" + pips1 + "_" + pips2 + ".png");
-		//String fileName = new String("ImageSrc/transparenzTest" + 2 + "_" + 4 + "_new" + ".png");
+		// Es wird ein String erzeugt, der auf die passende Bilddatei verweist
 		String fileName = new String("ImageSrc/" + "new" + pips1 + "_" + pips2 + ".png");
 		System.out.println("Dateiname: " + fileName);
+		
+		// Das Bild laden und eventuellen Fehler ausgeben
 		try {
-			//if (pips1 == 2 && pips2 == 4)		// TODO passendes Bild raussuchen
-			//{
-				image = ImageIO.read(new File(fileName));
-				rawImage = image;
-				icon = Toolkit.getDefaultToolkit().createImage(image.getSource());
-			//}
+			image = ImageIO.read(new File(fileName));
+			rawImage = image;
+			icon = Toolkit.getDefaultToolkit().createImage(image.getSource());
 		} catch (IOException e) {
-			System.err.println("Fehler!");
+			System.err.println("Bild: " + fileName + " konnte nicht geladen werden");
 			e.printStackTrace();
 		}
 	}
