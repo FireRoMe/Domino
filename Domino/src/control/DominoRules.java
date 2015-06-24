@@ -23,8 +23,9 @@ public final class DominoRules
 		int t_p1 = target.getStone().getPips1();
 		int t_p2 = target.getStone().getPips2();
 		
+		// wenn einer Seite des einen Steins mit einer Seite des anderen uebereinstimmt
 		if (d_p1 == t_p1 || d_p1 == t_p2 || d_p2 == t_p1 || d_p2 == t_p2)
-			return true;
+			return true;	// sind die Steine grundlegend kompatibel
 		else
 			return false;
 	}
@@ -92,14 +93,24 @@ public final class DominoRules
 		}
 	}
 	
+	/**
+	 * Ueberprueft fuer das horizontale anlegen, wo ein Stein Nachbarn hat
+	 * @param dragged - Der anzulegende Stein
+	 * @param target - Der Zielstein
+	 * @param snapRight - boolean, ob rechts angelegt werden soll
+	 * @return <b>true</b> - der Stein hat an der Zielseite keinen Nachbarn <br>
+	 * <b>false</b> - sonst
+	 */
 	public static boolean checkNeighboursHorizontal(DominoLabel dragged, DominoLabel target, boolean snapRight)
 	{
+		// wenn rechts angelegt werden soll
 		if (snapRight)
 		{
+			// wenn der Stein rechts keinen Nachbarn hat
 			if (target.getStone().getRightNeighbour() == null)
-				return true;
+				return true;	// kann rechts angelegt werden
 			else
-				return false;
+				return false;	// es kann nicht rechts angelegt werden
 		}
 		else
 		{
@@ -110,61 +121,87 @@ public final class DominoRules
 		}
 	}
 	
+	/**
+	 * Prueft, ob an der oberen Seite des Steins angelegt werden kann
+	 * @param draggedStone - Der Stein, der gelegt werden soll
+	 * @param target - Der Stein, an den angelegt werden soll
+	 * @return <b>true</b> - Der Stein soll oben angelegt werden<br>
+	 * <b>false</b> - Der Stein soll unten angelegt werden
+	 */
 	public static boolean snapTop(DominoLabel draggedStone, DominoLabel target)
 	{
+		// Steine aus den Labels holen
 		Stone dStone = draggedStone.getStone();
 		Stone tStone = target.getStone();
+		// uebereinstimmende Seite berechnen
 		int equalPip = giveEqualPip(dStone, tStone);
 		
+		// wenn der Stein ein Doppelstein ist
 		if (equalPip == 0)
 		{
+			// wenn der Stein oben keinen Nachbarn hat
 			if (tStone.getTopNeighbour() == null)
 			{
+				// Stein richtig drehen und Bild im Label aktualisieren
 				dStone.checkRotationVertical(tStone, true);
 				draggedStone.updateImage();
 				
-				return true;
+				return true;	// Der Stein soll oben angelegt werden
 			}
+			// wenn der Stein obenen einen Nachbarn hat
 			else
 			{
 				dStone.checkRotationVertical(tStone, false);
 				draggedStone.updateImage();
 				
-				return false;
+				return false;	// Der Stein soll unten angelegt werden
 			}
 		}
 		
+		// wenn der Stein oben keinen Nachbarn hat und die
+		// obere Seite des Zielsteins uebereinstimmt
 		if (tStone.getTopNeighbour() == null && equalPip == 1)
 		{
 			dStone.checkRotationVertical(tStone, true);
 			draggedStone.updateImage();
 			
-			return true;
+			return true;	// Der Stein soll oben angelegt werden
 		}
 		else
 		{
 			dStone.checkRotationVertical(tStone, false);
 			draggedStone.updateImage();
 			
-			return false;
+			return false;	// Der Stein soll oben angelegt werden
 		}
 	}
-
+	
+	/**
+	 * Ueberprueft fuer das vertikale anlegen, wo ein Stein Nachbarn hat
+	 * @param dragged - Der anzulegende Stein
+	 * @param target - Der Zielstein
+	 * @param snapRight - boolean, ob rechts angelegt werden soll
+	 * @return <b>true</b> - der Stein hat an der Zielseite keinen Nachbarn <br>
+	 * <b>false</b> - sonst
+	 */
 	public static boolean checkNeighboursVertical(DominoLabel draggedStone, DominoLabel target, boolean snapTop)
 	{
+		// wenn oben angelegt werden soll
 		if (snapTop)
 		{
+			// wenn der Zielstein oben keinen Nachbarn hat
 			if (target.getStone().getTopNeighbour() == null)
-				return true;
+				return true;	// kann oben angelegt werden
 			else
-				return false;
+				return false;	// sonst kann nicht oben angelegt werden
 		}
 		else
 		{
+			// wenn der Zielstein unten keinen Nachbarn hat 
 			if (target.getStone().getBottomNeighbour() == null)
-				return true;
+				return true;	// kann unten angelegt werden
 			else
-				return false;
+				return false;	// sonst kann nicht unten angelegt werden
 		}
 	}
 	
@@ -187,25 +224,23 @@ public final class DominoRules
 		else
 			return 2;
 	}
-
+	
+	/**
+	 * Prueft, ob vertikal angelegt werden muss
+	 * @param target - Der Zielstein
+	 * @return <b>true</b> - wenn vertikal angelegt werden muss<br>
+	 * <b>false</b> - sonst
+	 */
 	public static boolean checkIfVertical(DominoLabel target)
 	{
+		// Stein aus dem Label holen
 		Stone tStone = target.getStone();
 		
-		// TODO Debug ausgabe löschen
-		if (tStone.getLeftNeighbour() != null && tStone.getRightNeighbour() != null)
-		{
-			System.err.println("checkIFVertical: \n\r"
-					+ "Spinner: " + tStone.isSpinner() + "\n\r"
-					+ "Links: " + tStone.getLeftNeighbour().getPips1() + "|" + tStone.getLeftNeighbour().getPips2() + "\n\r"
-					+ "Rechts: " + tStone.getRightNeighbour().getPips1() + "|" + tStone.getRightNeighbour().getPips2());
-		}
-		else
-			System.err.println("Kein Spinner");
-		
+		// wenn der Zielstein ein Spinner ist und horizontal nicht angelegt werden kann
 		if (tStone.isSpinner() && tStone.getLeftNeighbour() != null && tStone.getRightNeighbour() != null)
 			return true;
 		
+		// wenn der Zielstein bereits vertikal liegt
 		else if (tStone.isVertical())
 			return true;
 		
@@ -213,18 +248,29 @@ public final class DominoRules
 			return false;
 	}
 	
-	public static boolean checkPossibleMove(Stone target, DominoLabel draggedStone, Point errorPoint)
+	/**
+	 * Prueft, ob ein Stein der von der Hand aufs Feld gebracht wurde an den Stein angelegt<br>
+	 * werden kann, über den er gelegt wurde
+	 * @param target - Der Zielstein
+	 * @param draggedStone - Der Stein der angelegt werden soll
+	 * @return - <b>true</b> - wenn angelegt werden kann<br>
+	 * <b>false</b> - wenn nicht angelegt werden kann
+	 */
+	public static boolean checkPossibleMove(Stone target, DominoLabel draggedStone)
 	{
 		String error = "Dieser Zug ist leider nicht moeglich";
 		
+		// Nachbarn des Zielsteins zum leichteren Zugriff aus Stein holen
 		Stone left = target.getLeftNeighbour();
 		Stone right = target.getRightNeighbour();
 		Stone top = target.getTopNeighbour();
 		Stone bottom = target.getBottomNeighbour();
 		
+		// wenn der Zielstein horizontal liegt
 		if (!target.isVertical())
-			if (!target.isSpinner())
+			if (!target.isSpinner())	// wenn der Zielstein kein Spinner ist	
 			{
+				// wenn der Zielstein links oder rechts keinen Nachbarn hat
 				if (left == null || right == null)
 				{
 					return true;
@@ -232,12 +278,12 @@ public final class DominoRules
 				else
 				{
 					System.out.println(error);
-//					draggedStone.setLocation(errorPoint);
 					return false;
 				}
 			}
 			else
 			{
+				// wenn der Spinner links, rechts, oben oder unten keinen Nachbarn hat
 				if (left == null || right == null || top == null || bottom == null)
 				{
 					return true;
@@ -245,12 +291,13 @@ public final class DominoRules
 				else
 				{
 					System.out.println(error);
-//					draggedStone.setLocation(errorPoint);
 					return false;
 				}
 			}
+		// wenn der Zielstein vertikal liegt
 		else
 		{
+			// wenn der Zielstein oben und unten keinen Nachbarn hat
 			if (top == null || bottom == null)
 			{
 				return true;
@@ -258,16 +305,24 @@ public final class DominoRules
 			else
 			{
 				System.out.println(error);
-//				draggedStone.setLocation(errorPoint);
 				return false;
 			}
 		}
 	}
 	
+	/**
+	 * Prueft, ob der angelegte Stein oder der Zielstein ein Spinner werden soll
+	 * @param draggedStone - Der angelegte Stein
+	 * @param target - Der Stein, an den angelegt wurde
+	 * @param hasSpinner - Gibt an, ob bereits ein Spinner auf dem Feld liegt
+	 * @return - Den Stein, der der neue Spinner ist oder null
+	 */
 	public static Stone checkSpinner(DominoLabel draggedStone, DominoLabel target, boolean hasSpinner)
 	{
+		// wenn das Spiel keinen Spinner hat und der angelegte Stein ein Doppelstein ist
 		if (!hasSpinner && draggedStone.getStone().isDoublestone())
 		{
+			// Im Steinobjekt den Stein zum Spinner machen
 			draggedStone.getStone().setSpinner(true);
 			return draggedStone.getStone();
 		}
@@ -276,6 +331,7 @@ public final class DominoRules
 			target.getStone().setSpinner(true);
 			return target.getStone();
 		}
+		// wenn es schon einen Spinner gibt, oder der keiner der Steine ein Doppelstein ist
 		else 
 			return null;
 	}
@@ -293,11 +349,6 @@ public final class DominoRules
 		if (draggedStone.getStone().isDoublestone())
 		{
 			doublePoints[0] = true;
-//			if (edgePoints[2] == 0 && edgePoints[3] == 0)
-//			{
-//				edgePoints[2] = draggedStone.getStone().getPips1();
-//				edgePoints[3] = draggedStone.getStone().getPips1();
-//			}
 		}
 		else
 			doublePoints[0] = false;
@@ -308,11 +359,6 @@ public final class DominoRules
 			if (target.getStone().isDoublestone())
 			{
 				doublePoints[1] = true;
-//				if (edgePoints[2] == 0 && edgePoints[3] == 0)
-//				{
-//					edgePoints[2] = target.getStone().getPips2();
-//					edgePoints[3] = target.getStone().getPips2();
-//				}
 			}
 			else
 				doublePoints[1] = false;
@@ -332,11 +378,6 @@ public final class DominoRules
 		if (draggedStone.getStone().isDoublestone())
 		{
 			doublePoints[1] = true;
-//			if (edgePoints[2] == 0 && edgePoints[3] == 0)
-//			{
-//				edgePoints[2] = draggedStone.getStone().getPips2();
-//				edgePoints[3] = draggedStone.getStone().getPips2();
-//			}
 		}
 		else 
 			doublePoints[1] = false;
@@ -347,11 +388,6 @@ public final class DominoRules
 			if (target.getStone().isDoublestone())
 			{
 				doublePoints[0] = true;
-//				if (edgePoints[2] == 0 && edgePoints[3] == 0)
-//				{
-//					edgePoints[2] = target.getStone().getPips2();
-//					edgePoints[3] = target.getStone().getPips2();
-//				}
 			}
 			else
 				doublePoints[0] = false;
@@ -417,13 +453,13 @@ public final class DominoRules
 		{
 			for (int p: edgePoints)
 			{
-				if (p != 7)		// Wenn p eine 7 ist, wurde an diese Kante noch nicht angelegt. Meist oben oder unten
+				// Wenn p eine 7 ist, wurde an diese Kante noch nicht angelegt. Meist oben oder unten
+				if (p != 7)
 				{
 					if (doublePoints[i] == false)
 						points += p;
 					else
 					{
-		//				if (i != 0 && i != 1)
 							points += p*2;
 					}
 				}

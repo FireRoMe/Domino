@@ -72,7 +72,7 @@ public class DominoGame
 		view.initializeWindow(allStones, mouseHandler, new ButtonListener());
 		currentPlayerIndex = chooseBeginner();
 		
-		view.updateSplashLabels();
+		view.showStartSplash();
 		showRoundInfo("", "", 80f, 0);
 		startMove();
 	}
@@ -92,7 +92,7 @@ public class DominoGame
 			labelText2 = text2;
 		}
 		
-		view.showGameInfo(labelText1, labelText2, textSize, delay);
+		view.showGameInfo(labelText1, labelText2, textSize, delay, true);
 	}
 	
 	private void startMove()
@@ -159,7 +159,7 @@ public class DominoGame
 			int otherPlayer = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
 			String text1 = "Spieler " + (currentPlayerIndex+1) + " kann nicht legen";
 			String text2 = "Spieler " + (otherPlayer+1) + " ist am Zug";
-			view.showGameInfo(text1, text2, 40f, 0);
+			view.showGameInfo(text1, text2, 40f, 0, true);
 			currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
 			allPlayers[currentPlayerIndex].setDroppedStone(false);
 			startMove();
@@ -174,7 +174,7 @@ public class DominoGame
 		String winnerString = "Spieler " + (winner+1) + " gewinnt die Runde";
 		String pointsString = "und erhält " + winnerPoints + " Punkte";
 		
-		view.showGameInfo(winnerString, pointsString, 40f, 0);
+		view.showGameInfo(winnerString, pointsString, 40f, 0, true);
 		view.updatePlayerPoints(allPlayers[winner], winner);
 		
 		if (allPlayers[winner].getPoints() < winningPoints)
@@ -194,16 +194,24 @@ public class DominoGame
 			endGame(winner+1);
 	}
 
+	/**
+	 * 
+	 * @param winner
+	 */
 	private void endGame(int winner)
 	{
 		view.resetWindow();
 		String text1 = "Herzlichen Glückwunsch Spieler " + winner;
 		String text2 = "Sie haben gewonnen!";
 		view.updateButton(false, "Spiel beendet");
-		view.showGameInfo(text1, text2, 60f, 0);
-		view.showGameInfo("Toll gemacht", "Vielen Dank für's Spielen!", 80f, 2100);
+		view.showGameInfo(text1, text2, 60f, 0, true);
+		view.showGameInfo("Toll gemacht", "Vielen Dank für's Spielen!", 80f, 2100, false);
 	}
-
+	
+	/**
+	 * Setzt alle relevante Instanzvariablen zurueck, bevor die naechste Runde
+	 * gestartet wird
+	 */
 	private void resetRound()
 	{
 		for (int i = 0; i < edgePoints.length; i++)
@@ -222,6 +230,7 @@ public class DominoGame
 		}
 		
 		playedDominoes = 0;
+		mouseHandler.panelOffsetX = 0;
 		
 		view.resetWindow();
 	}
@@ -396,18 +405,19 @@ public class DominoGame
 		}
 	}
 	
+	/**
+	 * Uebergibt die aktuelle Hand des aktiven Spielers zum<br>
+	 * darstellen an das Hauptfenster
+	 * @param PlayerIndex - Der Index des Spielers, dessen Steine gezeichnet werden sollen
+	 */
 	private void drawStonesOnView(int PlayerIndex)
 	{
+		// geht durch alle Steine, die der Spieler auf der Hand hat
 		for (Stone s: allPlayers[PlayerIndex].getHand())
 		{
+			// uebergibt den aktuellen Stein an eine Methode des Hauptfensters,
+			// die die Steine auf die handPane zeichnet
 			view.addDominoeToHand(s, allPlayers[PlayerIndex].isFirstMove());
-			try
-			{
-				TimeUnit.MILLISECONDS.sleep(0);
-			} catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -419,8 +429,6 @@ public class DominoGame
 		private PointerInfo mousePos;
 		private DominoLabel draggedStone;
 		private DominoLabel target;
-		/** Der Punkt, an den ein nicht passender Stein zurückgeschoben wird */
-		private Point errorPoint= null;		// TODO - Den Stein zurückschnappen lassen, wenn unpassend
 		/** Die derzeit gedueckte Maustaste */
 		private int pressedButton;
 		private int draggedAtX, draggedAtY;
@@ -445,7 +453,6 @@ public class DominoGame
 					if (dLabel.isDraggable())
 					{
 						Point origin = view.getFrameCoordinates();
-						errorPoint = dLabel.getLocation();
 						
 						draggedStone = dLabel;
 						
@@ -676,7 +683,7 @@ public class DominoGame
 				{
 					view.textOut("Es gibt ein target");
 					
-					if (DominoRules.checkPossibleMove(target.getStone(), draggedStone, errorPoint))
+					if (DominoRules.checkPossibleMove(target.getStone(), draggedStone))
 					{
 						if (spinner == null)
 						{
@@ -776,7 +783,7 @@ public class DominoGame
 					int otherPlayer = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
 					String text1 = "Spieler " + (currentPlayerIndex+1) + " kann nicht legen";
 					String text2 = "Spieler " + (otherPlayer+1) + " ist am Zug";
-					view.showGameInfo(text1, text2, 40f, 0);
+					view.showGameInfo(text1, text2, 40f, 0, true);
 					DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
 					startMove();
 				}

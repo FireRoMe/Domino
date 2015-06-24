@@ -705,15 +705,16 @@ public class MainWindow
 		
 		updatePanels();
 	}
-
+	
+	/**
+	 * Loescht auf GUI alle Steine von der Hand
+	 */
 	public void clearHand()
 	{
-		handPane.removeAll();
-		handPane.validate();
-		handPane.repaint();
-		handLabels.clear();
+		handPane.removeAll();	// Alle Labels vom JPanel "Hand" leoschen
+		handLabels.clear();		// Alle Labels aus der Hand-ArrayList loeschen
 		
-		updatePanels();
+		updatePanels();		// Grafik auffrischen, um Aenderungen wirksam zu machen
 	}
 
 	public void firstPoints(int[] edgePoints, boolean[] doublePoints)
@@ -739,6 +740,11 @@ public class MainWindow
 			lbl_player2Points.setText("Spieler 2: " + player.getPoints());
 	}
 	
+	/**
+	 * Stellt den Pfeil neben der Punktzahl des aktuellen Spielers dar
+	 * @param playerIndex - Index des aktuellen Spielers
+	 * @param playedDominoes - 
+	 */
 	public void updatePlayerArrow(int playerIndex, int playedDominoes)
 	{
 		ImageIcon arrow = null;
@@ -780,44 +786,69 @@ public class MainWindow
 		}
 	}
 	
+	/**
+	 * Setzt alle relaventen Variablen im Fenster zurueck,
+	 * bevor die Runde neu gestartet wird
+	 */
 	public void resetWindow()
 	{
+		// Punktelabel zuruecksetzen
 		lbl_points.setText("Punkte: 0");
+		// Punktelabel der Spieler auf Ursprungskoordinaten zurueck schieben
+		lbl_player1Points.setBounds(contentPane.getWidth() - 93, 45, 105, 20);
+		lbl_player2Points.setBounds(contentPane.getWidth() - 93, 65, 105, 20);
+		// Icon aus Spielerlabels entfernen
+		lbl_player1Points.setIcon(null);
+		lbl_player2Points.setIcon(null);
+		// Alle DominoLabels aus der Steinliste loeschen
 		dLabels.clear();
 		clearHand();
+		// Spielfeld wieder an die Ursprungsposition schieben
 		graphicsPane.setLocation(-5500, -5500);
+		// Alle Labels vom Spielfeld loeschen
 		graphicsPane.removeAll();
+		// paintingComponent wieder hinzufuegen
 		graphicsPane.add(paintingComponent);
 		
-		updatePanels();
+		updatePanels();		// Grafik auffrischen, um Aenderungen wirksam zu machen
 	}
 	
-	public void updateSplashLabels()
+	/**
+	 * Zeigt den Dominoschriftzug an der zu sehen ist, wenn das Programm startet 
+	 */
+	public void showStartSplash()
 	{
-		Timer t = new Timer(true);
+		// Button inaktiv machen
 		updateButton(false, "");
 		
-		int fontSize1 = 0;
+		int fontSize1 = 0;	// Anfangsschriftgroesse ist 0
 		
-		lbl_splash1.setVisible(true);
+		lbl_splash1.setVisible(true);	// Label sichtbar machen
 		
+		// Labeltext setzen
 		lbl_splash1.setText("Let's play Domino");
+		// Schriftgroesse des Labeltextes auf Anfangsschriftgroesse setzen
 		lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize1));
 		
+		// Schleife von 0 bis 255 (RGB- und Alpha-Werte)
 		for (int i = 0; i <= 255; i++)
 		{
+			// Schriftfarbe des Labels anhand des Schleifenzaehlers aendern
 			lbl_splash1.setForeground(new Color(255 - i,(i/2),(i/4),i));
 				
+			// Variable fuer Schriftgroesse erhoehen, bis maximal 100
 			if (i % 3 == 0 && fontSize1 < 100)
 				fontSize1++;
 			
+			// Schrift vergroessern
 			lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize1));
 			
-			delay(5);
+			delay(5);	// Verzoegerung vor dem naechsten Schleifendurchlauf
 		}
 		
-		delay(1500);
+		delay(1500);	// Zeit, die der Schriftzug in voller Groesse dargestellt wird
 		
+		// umgekehrte Schleife fuer verkleinerung der Schrift
 		for (int i = 255; i >= 0; i--)
 		{
 			lbl_splash1.setForeground(new Color(255 - i,(i/2),(i/4),i));
@@ -828,44 +859,69 @@ public class MainWindow
 				
 			lbl_splash1.setFont(lbl_splash1.getFont().deriveFont((float)fontSize1));
 			
-			delay(1);
+			delay(1);	// laeuft schneller ab, da Verzoegerung geringer
 		}
+		// zum Schluss wird das Label ausgeblendet
 		lbl_splash1.setVisible(false);
 		
-		delay(300);
+		delay(300);	// Verzoegerung, bevor die Methode verlassen wird
 	}
 	
-	public void showGameInfo(final String text1, final String text2, final float textSize, int delay)
+	/**
+	 * Stellt diverse Meldungen auf dem Bildschirm dar
+	 * @param text1 - Der Text, der in dem oberen Label stehen soll
+	 * @param text2 - Der Text, der in dem oberen Label stehen soll
+	 * @param textSize - die Textgroesse
+	 * @param delay - Die Zeit, die verstreichen soll, bevor die Meldung angezeigt wird (in Millisekunden)
+	 * @param fadeOut - Gibt an, ob die dargestellte Meldung wieder ausgeblendet werden soll
+	 */
+	public void showGameInfo(final String text1, final String text2, 
+			final float textSize, int delay, boolean fadeOut)
 	{
-		Timer t = new Timer(true);
+		Timer t = new Timer(true);	// Der Timer fuer das ein- bzw. ausblenden
 		
+		// Die Aufgabe, die der Timer nach der Verzoegerung ausfuehren soll
 		t.schedule(new TimerTask()
 		{
 			@Override
 			public void run()
 			{
+				// Textgroesse setzen
 				lbl_splash1.setFont(lbl_splash1.getFont().deriveFont(textSize));
 				lbl_splash2.setFont(lbl_splash2.getFont().deriveFont(textSize));
+				// Textfarbe setzen
 				lbl_splash1.setForeground(Color.BLACK);
 				lbl_splash2.setForeground(Color.BLACK);
+				// Text setzen
 				lbl_splash1.setText(text1);
 				lbl_splash2.setText(text2);
+				// Label anzeigen
 				lbl_splash1.setVisible(true);
 				lbl_splash2.setVisible(true);
 			}
 		}, delay);
 		
-		t.schedule(new TimerTask()
+		// wenn die Meldung ausgeblendet werden soll
+		if (fadeOut)
 		{
-			@Override
-			public void run()
+			t.schedule(new TimerTask()
 			{
-				lbl_splash1.setVisible(false);
-				lbl_splash2.setVisible(false);
-			}
-		}, delay + 2000);
+				@Override
+				public void run()
+				{
+					// Label nach Verzoegerung wieder ausblenden
+					lbl_splash1.setVisible(false);
+					lbl_splash2.setVisible(false);
+				}
+			}, delay + 2000);
+		}
 	}
 	
+	/**
+	 * Laesst den Thread fuer die angebene Zeit pausieren, um eine
+	 * Verzoegerung zu erreichen (nur fuer den Splashscreen zu Beginn des Spiels)
+	 * @param milliseconds - Die Zeit in Millisekunden, die der Thread schlafen soll
+	 */
 	public void delay(int milliseconds)
 	{
 		try
