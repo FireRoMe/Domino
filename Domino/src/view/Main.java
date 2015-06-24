@@ -2,19 +2,14 @@ package view;
 
 import control.DominoGame;
 
-
+/**
+ * Main Domino 
+ */
 public class Main
 {
-
 	public static void main(String[] args)
 	{
-			long time1 = System.currentTimeMillis();
-			
-			MainWindow view = new MainWindow();
-			view.textOut("Zwischenzeit: " + (System.currentTimeMillis() - time1));
-			new DominoGame(view, 2);
-			
-			view.textOut("Ladezeit: " + (System.currentTimeMillis() - time1));
+		MainWindow view = new MainWindow();
+		new DominoGame(view, 2);
 	}
-
 }

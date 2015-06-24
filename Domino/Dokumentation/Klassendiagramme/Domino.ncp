@@ -7,8 +7,8 @@
       <Entity type="Class">
         <Name>Main</Name>
         <Access>Public</Access>
-        <Location left="1440" top="288" />
-        <Size width="162" height="94" />
+        <Location left="1729" top="10" />
+        <Size width="269" height="227" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public static void Main(String[] args)</Member>
         <Modifier>None</Modifier>
@@ -16,8 +16,8 @@
       <Entity type="Class">
         <Name>MainWindow</Name>
         <Access>Public</Access>
-        <Location left="1608" top="288" />
-        <Size width="840" height="791" />
+        <Location left="694" top="498" />
+        <Size width="631" height="989" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int[] paintingComponent</Member>
         <Member type="Field">private int[] renderedImages</Member>
@@ -66,8 +66,8 @@
       <Entity type="Class">
         <Name>DominoGame</Name>
         <Access>Public</Access>
-        <Location left="355" top="288" />
-        <Size width="240" height="451" />
+        <Location left="1344" top="10" />
+        <Size width="367" height="468" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Stone[] allStones</Member>
         <Member type="Field">private ArrayList&lt;Stone&gt; talon</Member>
@@ -96,8 +96,8 @@
       <Entity type="Class">
         <Name>Player</Name>
         <Access>Public</Access>
-        <Location left="606" top="288" />
-        <Size width="267" height="468" />
+        <Location left="1729" top="498" />
+        <Size width="269" height="468" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private ArrayList&lt;Stone&gt; hand</Member>
         <Member type="Field">private String name</Member>
@@ -127,8 +127,8 @@
       <Entity type="Class">
         <Name>Stone</Name>
         <Access>Public</Access>
-        <Location left="880" top="288" />
-        <Size width="381" height="791" />
+        <Location left="1344" top="498" />
+        <Size width="367" height="791" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int pips1</Member>
         <Member type="Field">private int pips2</Member>
@@ -177,8 +177,8 @@
       <Entity type="Class">
         <Name>DominoLabel</Name>
         <Access>Public</Access>
-        <Location left="1270" top="288" />
-        <Size width="162" height="179" />
+        <Location left="1729" top="256" />
+        <Size width="269" height="222" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Stone stone</Member>
         <Member type="Field">private boolean draggable</Member>
@@ -189,26 +189,10 @@
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
-        <Name>RenderImage</Name>
-        <Access>Public</Access>
-        <Location left="2459" top="288" />
-        <Size width="230" height="213" />
-        <Collapsed>False</Collapsed>
-        <Member type="Field">private Image img</Member>
-        <Member type="Field">private double degrees</Member>
-        <Member type="Field">private Dimension pos</Member>
-        <Member type="Field">private Dimension size</Member>
-        <Member type="Method">public Image getImg()</Member>
-        <Member type="Method">public double getDegrees()</Member>
-        <Member type="Method">public Dimension getPos()</Member>
-        <Member type="Method">public Dimension getSize()</Member>
-        <Modifier>None</Modifier>
-      </Entity>
-      <Entity type="Class">
         <Name>DominoRules</Name>
         <Access>Public</Access>
-        <Location left="2698" top="288" />
-        <Size width="631" height="434" />
+        <Location left="694" top="10" />
+        <Size width="631" height="468" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public static boolean checkCompatibility(DominoLabel dragged, DominoLabel target)</Member>
         <Member type="Method">public static boolean snapRight(DominoLabel draggedStone, DominoLabel target)</Member>
@@ -231,7 +215,7 @@
         <Member type="Method">public static boolean calculatePlayerPoints(int points, Player player)</Member>
         <Member type="Method">public static int calculateRoundPoints(Player[] allPlayers)</Member>
         <Member type="Method">public static int calculateHandPoints(ArrayList&lt;Stone&gt; hand)</Member>
-        <Modifier>None</Modifier>
+        <Modifier>Static</Modifier>
       </Entity>
     </Entities>
     <Relationships />

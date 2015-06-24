@@ -1,6 +1,5 @@
 package control;
 
-import java.awt.Point;
 import java.util.ArrayList;
 
 import data.Player;
@@ -340,206 +339,228 @@ public final class DominoRules
 	 * Berechnet die Punkte, wenn ein Stein links angelegt wird
 	 * @param draggedStone - Der Stein, der angelegt wird
 	 * @param target - Der Stein, an den angelegt wird
-	 * @param edgePoints - Die Punkte, die vom Spiel übergeben werden
-	 * @param doublePoints - Gibt an, wo ein Doppelstein liegt
+	 * @param edgePoints - haelt die Punktzahlen der offenen Kanten
+	 * @param doublePoints - Gibt an, an welchen Kanten Doppelsteine liegen
 	 */
-	public static void calculatePointsLeft(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
+	public static void calculatePointsLeft(DominoLabel draggedStone, DominoLabel target, 
+											int[] edgePoints, boolean[] doublePoints)
 	{
+		// holt sich die Punkte der linken Seite aus dem Stein und schreibt
+		// sie das Punkte-Array an den Index 0 fuer die linke Seite
 		edgePoints[0] = draggedStone.getStone().getPips1();
+		// wenn der angelegte Stein ein Doppelstein ist
 		if (draggedStone.getStone().isDoublestone())
-		{
-			doublePoints[0] = true;
-		}
-		else
-			doublePoints[0] = false;
+			doublePoints[0] = true;	// wird gespeichert, dass links ein Doppelstein ist
 		
-		if (target.getStone().getRightNeighbour() == null)
-		{
-			edgePoints[1] = target.getStone().getPips2();
-			if (target.getStone().isDoublestone())
-			{
-				doublePoints[1] = true;
-			}
-			else
-				doublePoints[1] = false;
-		}
+		// ist der angelegte Stein kein Doppelstein
+		else
+			doublePoints[0] = false; // wird gespeichert, dass dort kein Doppelstein (mehr) ist
 	}
 	
 	/**
 	 * Berechnet die Punkte, wenn ein Stein rechts angelegt wird
 	 * @param draggedStone - Der Stein, der angelegt wird
 	 * @param target - Der Stein, an den angelegt wird
-	 * @param edgePoints - Die Punkte, die vom Spiel übergeben werden
-	 * @param doublePoints - Gibt an, wo ein Doppelstein liegt
+	 * @param edgePoints - haelt die Punktzahlen der offenen Kanten
+	 * @param doublePoints - Gibt an, an welchen Kanten Doppelsteine liegen
 	 */
-	public static void calculatePointsRight(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
+	public static void calculatePointsRight(DominoLabel draggedStone, DominoLabel target,
+											int[] edgePoints, boolean[] doublePoints)
 	{
+		// Kommentare aehnlich calculatePointsLeft
 		edgePoints[1] = draggedStone.getStone().getPips2();
 		if (draggedStone.getStone().isDoublestone())
-		{
 			doublePoints[1] = true;
-		}
 		else 
 			doublePoints[1] = false;
-		
-		if (target.getStone().getLeftNeighbour() == null)
-		{
-			edgePoints[0] = target.getStone().getPips1();
-			if (target.getStone().isDoublestone())
-			{
-				doublePoints[0] = true;
-			}
-			else
-				doublePoints[0] = false;
-		}
 	}
 	
 	/**
 	 * Berechnet die Punkte, wenn ein Stein unten angelegt wird
 	 * @param draggedStone - Der Stein, der angelegt wird
 	 * @param target - Der Stein, an den angelegt wird
-	 * @param edgePoints - Die Punkte, die vom Spiel übergeben werden
-	 * @param doublePoints - Gibt an, wo ein Doppelstein liegt
+	 * @param edgePoints - haelt die Punktzahlen der offenen Kanten
+	 * @param doublePoints - Gibt an, an welchen Kanten Doppelsteine liegen
 	 */
-	public static void calculatePointsBottom(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
+	public static void calculatePointsBottom(DominoLabel draggedStone, DominoLabel target, 
+											int[] edgePoints, boolean[] doublePoints)
 	{
+		//Kommentare aehnlich calculatePointsLeft
 		edgePoints[3] = draggedStone.getStone().getPips2();
 		if (draggedStone.getStone().isDoublestone())
 			doublePoints[3] = true;
 		else
 			doublePoints[3] = false;
-		
-		if (target.getStone().getTopNeighbour() == null)
-		{
-			edgePoints[2] = target.getStone().getPips1();
-			if (target.getStone().isDoublestone() && !target.getStone().isSpinner())
-				doublePoints[2] = true;
-			else
-				doublePoints[2] = false;
-		}
 	}
 	
 	/**
 	 * Berechnet die Punkte, wenn ein Stein oben angelegt wird
 	 * @param draggedStone - Der Stein, der angelegt wird
 	 * @param target - Der Stein, an den angelegt wird
-	 * @param edgePoints - Die Punkte, die vom Spiel übergeben werden
-	 * @param doublePoints - Gibt an, wo ein Doppelstein liegt
+	 * @param edgePoints - haelt die Punktzahlen der offenen Kanten
+	 * @param doublePoints - Gibt an, an welchen Kanten Doppelsteine liegen
 	 */
-	public static void calculatePointsTop(DominoLabel draggedStone, DominoLabel target, int[] edgePoints, boolean[] doublePoints)
+	public static void calculatePointsTop(DominoLabel draggedStone, DominoLabel target, 
+											int[] edgePoints, boolean[] doublePoints)
 	{
+		// Kommentare aehnlich calculatePointsLeft
 		edgePoints[2] = draggedStone.getStone().getPips1();
 		if (draggedStone.getStone().isDoublestone())
 			doublePoints[2] = true;
 		else
 			doublePoints[2] = false;
-		 
-		if (target.getStone().getBottomNeighbour() == null && !target.getStone().isSpinner())
-		{
-			edgePoints[3] = target.getStone().getPips2();
-			if (target.getStone().isDoublestone())
-				doublePoints[3] = true;
-			else
-				doublePoints[3] = false;
-		}
 	}
 	
+	/**
+	 * Berechnet die Punkte der offenen Kanten mit Beruecksichtigung von Doppelsteinen
+	 * @param edgePoints - haelt die Punktzahlen der offenen Kanten
+	 * @param doublePoints - Gibt an, an welchen Kanten Doppelsteine liegen
+	 * @param firstStone - true uebergeben, wenn diese Methode fuer den ersten Stein
+	 * 					   der Runde aufgerufen wird
+	 * @return - Die berechnete Punktzahl
+	 */
 	public static int calculatePoints(int[] edgePoints, boolean[] doublePoints, boolean firstStone)
 	{
+		// Deklaration und Initialisierung der Rueckgabevariable sowie des Schleifenzaehlers
 		int points = 0;
 		int i = 0;
 		
+		// wenn die Methode nicht fuer den ersten Zug aufgerufen wurde 
 		if (!firstStone)
 		{
+			// Schleife durch alle Kantenpunkte
 			for (int p: edgePoints)
 			{
 				// Wenn p eine 7 ist, wurde an diese Kante noch nicht angelegt. Meist oben oder unten
 				if (p != 7)
 				{
 					if (doublePoints[i] == false)
+						// Einfache Addition, wenn kein Doppelstein an der Kante liegt
 						points += p;
+					
 					else
-					{
-							points += p*2;
-					}
+						// Verdoppelung der Punkte, wenn an der Kante ein Doppelstein liegt
+						points += p*2;
 				}
-				
-				i++;
+				i++;	// Inkrementieren des Schleifenzaehlers
 			}
 		}
+		// wenn die Methode fuer den ersten Zug einer Runde aufgerufen wurde
 		else
-		{
+			// beim ersten Zug muessen nur die linke und rechte Kante addiert werden;
 			return edgePoints[0]+edgePoints[1];
-		}
-		return points;
+		
+		return points;	// Rueckgabe der Punkte
 	}
 
 	/**
 	 * Prueft, ob ein Stein von der Hand des Spielers auf dem Feld angelegt werden kann
 	 * @param stone - Der Stein der gelegt werden soll
 	 * @param edgePoints - Das Array, das die Punkte der offenen Enden beinhaltet
+	 * @param spinner - Der Spinner, der auf dem Feld liegt. Kann auch <i>null</i> sein
+	 * @param playedDominoes - Die Anzahl der bereits gelegten Steine
 	 * @return <b>true</b> - wenn der Stein gelegt werden kann <br>
 	 * <b>false</b> - wenn der Stein nicht gelegt werden kann
 	 */
 	public static boolean checkIfDroppable(Stone stone, int[] edgePoints, Stone spinner, int playedDominoes)
 	{
+		// Deklaration und Initialisierung der Zaehlvariable
 		int i = 0;
 		
+		// wenn noch keine Steine auf dem Feld liegen kann der Stein auf jeden Fall gelegt werden
 		if (playedDominoes == 0)
 			return true;
 		
+		// Schleife durch alle Kantenpunkte
 		for (int points: edgePoints)
 		{
-			System.out.println("Pruefstein: " + stone.getPips1() + ", " + stone.getPips2());
-			if (i > 1 && spinner == null)	// Wenn es keinen Spinner gibt muessen nicht alle Moeglichkeiten geprueft werden
+			// wenn es keinen Spinner gibt muessen die vertikalen Kanten nicht geprueft werden
+			// wenn i groesser wird als 1 bedeutet das, dass die vertikalen Kanten geprueft werden 
+			if (i > 1 && spinner == null)
 				break;
 			
+			// wenn die Punktzahl mit einer der Augenzahlen uebereinstimmt
 			if (points == stone.getPips1() || points == stone.getPips2())
-				return true;
+				return true;	// der Stein kann gelegt werden
 			
-			i++;
+			i++;	// Schleifenzaehler inkrementieren
 		}
 		
+		// wenn eine der vertikalen Kanten belegt ist und ein Spinner auf dem Feld liegt
 		if ((edgePoints[2] == 7 || edgePoints[3] == 7) && spinner != null)
 		{
+			// wenn an eine der beiden Kanten des spinners angelegt werden kann (null) 
 			if (spinner.getTopNeighbour() == null || spinner.getBottomNeighbour() == null)
 			{
+				// wenn eine der Augenzahlen des zu legenden Steins mit der Augenzahl des Spinners uebereinstimmt
 				if (stone.getPips1() == spinner.getPips1() || stone.getPips2() == spinner.getPips1())
-					return true;
+					return true;	// der Stein kann gelegt werden
 			}
 		}
 		
-		return false;
+		return false;	// der Stein kann nicht gelegt werden
 	}
 
+	/**
+	 * Wechselt den aktiven Spieler
+	 * @param allPlayers - Array, dass alle Spieler haelt
+	 * @param currentPlayerIndex - Index des aktuellen Spielers
+	 * @return Gibt den Index des neuen aktuellen Spieler zurueck
+	 */
 	public static int switchPlayer(Player[] allPlayers, int currentPlayerIndex)
 	{
+		// wenn die Spieler gewechselt werden hat der aktuelle Spieler seinen ersten Zug gemacht,
+		// daher kann die Variable firstMove im Spieler auf false gesetzt werden
 		allPlayers[currentPlayerIndex].setfirstMove(false);
 		
+		// wenn der letzte Spieler am Zug war, ist der erste Spieler an der Reihe
 		if ((allPlayers.length - 1) == currentPlayerIndex)
 			return 0;
+		// sonst ist der naechste Spieler dran
 		else
 			return ++currentPlayerIndex;
 	}
-
+	
+	/**
+	 * Setzt die Punktzahlen fuer den ersten Stein, der gelegt wurde
+	 * @param stone - Der Stein, der gelegt wurde
+	 * @param edgePoints - haelt die Punktzahlen der offenen Kanten
+	 * @param doublePoints - speichert, an welcher offenen Kante ein Doppelstein liegt
+	 */
 	public static void firstStone(Stone stone, int[] edgePoints, boolean[] doublePoints)
 	{
+		// Punktzahlen fuer linke und rechte Kante setzen
 		edgePoints[0] = stone.getPips1();
 		edgePoints[1] = stone.getPips2();
 		
+		// wenn der erste Stein ein Doppelstein ist wird gespeichert, dass an der linken
+		// Kante ein Doppelstein liegt, weil der zweite Stein rechts angelegt wird
 		if (stone.isDoublestone())
 		{
 			doublePoints[0] = true;
+			// da es der erste Doppelstein ist der gelegt wurde ist dieser der Spinner
 			stone.setSpinner(true);
 		}
 	}
 	
-	public static boolean calculatePlayerPoints(int[] edgePoints, boolean[] doublePoints, Player player)
+	/**
+	 * 
+	 * @param edgePoints - haelt die Punktzahlen der offenen Kanten
+	 * @param doublePoints - speichert, an welcher offenen Kante ein Doppelstein liegt
+	 * @param player - der Spieler fuer den die Punkte berechnet werden sollen
+	 * @param firstMove - true, wenn die Methode fuer den ersten Zug aufgerufen wird
+	 * @return <b>true</b> - wenn der Spieler Punkte bekommen hat<br>
+	 * <b>false</b> - wenn der Spieler keine Punkte bekommen hat
+	 */
+	public static boolean calculatePlayerPoints(int[] edgePoints, boolean[] doublePoints
+												, Player player, boolean firstMove)
 	{
-		int points = calculatePoints(edgePoints, doublePoints, false);
+		int points = calculatePoints(edgePoints, doublePoints, firstMove);
 		
+		// wenn die Punkte glatt durch 5 teilbar sind...
 		if (points % 5 == 0)
 		{
+			// ...werden die Punkte des Spielers um diesen Wert erhoeht 
 			player.increasePoints(points);
 			return true;
 		}
@@ -547,39 +568,46 @@ public final class DominoRules
 		return false;
 	}
 
-	public static boolean calculatePlayerPoints(int points, Player player)
-	{
-		if (points % 5 == 0)
-		{
-			player.increasePoints(points);
-			return true;
-		}
-		
-		return false;
-	}
-
+	/**
+	 * Prueft welcher Spieler eine Runde gewinnt
+	 * @param allPlayers - Array, das alle Spieler haelt
+	 * @param returnPoints - wenn true uebergeben wird, werden die Punkte zurueckgegeben
+	 * @return wenn returnPoints true - Der Index des Gewinners<br>  
+	 * wenn returnPoints false - Die Punkte, die der Gewinner gutgeschrieben bekommt
+	 */
 	public static int calculateRoundPoints(Player[] allPlayers, boolean returnPoints)
 	{
+		// vor der Pruefung gewinnt Spieler 1
 		int winner = 0;
 		int loser = 1;
 		
+		// wenn Spieler 1 mehr Steine auf der Hand hat als Spieler 2...
 		if (allPlayers[0].getHand().size() > allPlayers[1].getHand().size())
 		{
+			// gewinnt Spieler 2 die Runde
 			winner = 1;
 			loser = 0;
 		}
 		
+		// die Werte aller Steine auf der Hand des Verlierers werden aufsummiert 
 		int winnerPoints = calculateHandPoints(allPlayers[loser].getHand());
 		
+		// Rueckgabe des jeweiligen Wertes abhaengig von returnPoints
 		if (returnPoints)
-			return winnerPoints;
+			return winnerPoints;	// Punkte des Gewinners
 		else
 		{
+			// nur wenn returnPoints false ist werden dem Spieler die Punkte gutgeschrieben
 			allPlayers[winner].increasePoints(winnerPoints);
-			return winner;
+			return winner;	//	der Index des Gewinners
 		}
 	}
 
+	/**
+	 * Berechnet die Summe der Werte aller Steine auf der Hand eines Spielers
+	 * @param hand - Die Hand eines Spielers
+	 * @return Die berechnete Summe
+	 */
 	private static int calculateHandPoints(ArrayList<Stone> hand)
 	{
 		int points = 0;

@@ -1,8 +1,11 @@
 package view;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 
+/**
+ * Sollte die Bilder darstellen
+ * Zum loeschen vorgesehen 
+ */
 public class RenderImage
 {
 	private Image img;

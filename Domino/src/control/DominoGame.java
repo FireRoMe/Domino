@@ -12,8 +12,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import view.DominoLabel;
@@ -21,11 +19,18 @@ import view.MainWindow;
 import data.Player;
 import data.Stone;
 
+/**
+ * Die Hauptklasse des Spiels 
+ */
 public class DominoGame
 {
+	/** Haelt alle Steine im Spiel */
 	private Stone[] allStones = new Stone[28];
+	/** Der Pool aus dem die Spieler Steine ziehen*/
 	private ArrayList<Stone> talon = new ArrayList<Stone>();
+	/** Haelt alle Spieler*/
 	private Player[] allPlayers;
+	/** Der Index des aktuellen Spielers*/
 	private int currentPlayerIndex;
 	/** Ein Array, in dem die Punkte der offenen Enden gespeichert werden. <br>
 	 * [0]: links<br>[1]: rechts<br>[2]: oben<br>[3]: unten */
@@ -33,15 +38,20 @@ public class DominoGame
 	/** Ein Array, in dem gespeichert wird, ob eine offene Kante doppelte Punkte bringt <br>
 	 * [0]: links<br>[1]: rechts<br>[2]: oben<br>[3]: unten */
 	private boolean[] doublePoints = new boolean[4];
+	/** Gibt an, ob ein Spinner auf dem Feld liegt */
 	private boolean hasSpinner = false;
+	/** Speichert den Spinner */
 	private Stone spinner = null;
 	/** Zaehlt, wieviele Steine bereits gelegt worden sind */
 	private int playedDominoes = 0;
+	/** Gibt die aktuelle Runde an */
 	private int round = 1;
+	/** Das Hauptfenster, in dem das Spiel dargestellt wird */
 	private MainWindow view;
+	/** Der Listener fuer alle Mauseingaben */
 	private MouseClickMotionListener mouseHandler = new MouseClickMotionListener();
-	
-	private final int winningPoints= 250;
+	/** Die Anzahl der benoetigten Punkte zum gewinnen des Spiels */
+	private final int winningPoints = 250;
 	
 	/**
 	 * Erzeugt das Spiel
@@ -56,20 +66,24 @@ public class DominoGame
 		for (int i = 0; i < edgePoints.length; i++)
 			edgePoints[i] = 7;
 		
+		// das Hauptfenster wird im Spiel gespeichert
 		this.view = view;
-		view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
 		
 		initializeGame();
 	}
 	
+	/**
+	 * Initialisiert das Spiel
+	 */
 	public void initializeGame()
 	{
-		view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
 		initializeDominoes();
 		initializePlayers();
 		initializeHands();
 		initializeTalon();
+		// Initialisierung und anzeigen des Hauptfensters
 		view.initializeWindow(allStones, mouseHandler, new ButtonListener());
+		// Auswahl des Spielers der beginnen soll
 		currentPlayerIndex = chooseBeginner();
 		
 		view.showStartSplash();
@@ -77,6 +91,15 @@ public class DominoGame
 		startMove();
 	}
 	
+	/**
+	 * Zeigt die aktuelle Rundenzahl und den beginnenden Spieler
+	 * oder einen beliebigen Text an und blendet ihn nach
+	 * einer bestimmten Zeit wieder aus
+	 * @param text1 - der Text der im oberen Label stehen soll
+	 * @param text2 - der Text der im unteren Label stehen soll
+	 * @param textSize - die Textgroesse
+	 * @param delay - Verzoegerung in Millisekunden nach der der Text angezeigt werden soll
+	 */
 	private void showRoundInfo(String text1, String text2, float textSize, int delay)
 	{
 		String labelText1, labelText2;
@@ -95,6 +118,9 @@ public class DominoGame
 		view.showGameInfo(labelText1, labelText2, textSize, delay, true);
 	}
 	
+	/**
+	 * Initialisierung des Spielzuges
+	 */
 	private void startMove()
 	{
 		Player player = allPlayers[currentPlayerIndex];
@@ -102,7 +128,7 @@ public class DominoGame
 		int failCounter = 0;
 		boolean showDominoes = false;
 		boolean endRound = false;
-
+		
 		player.setDroppedStone(false);		
 		
 		view.textOut("Runde " + round + "!");
@@ -135,18 +161,28 @@ public class DominoGame
 		else
 			view.updateButton(false, "");
 		
+		// wenn der Talon leer ist oder der Spieler trotzdem legen kann...
 		if (!talon.isEmpty() || (talon.isEmpty() && blocked == false))
-			showDominoes = true;
+			showDominoes = true;	// ...werden die Steine im Fenster angezeigt
+		// wenn der Talon leer ist und der Spieler nicht legen kann...
 		else if (talon.isEmpty() && blocked == true)
-			showDominoes = false;
+			showDominoes = false;	// ...werden die Steine nicht angezeigt
 		
 		System.err.println("Stand showDominoes: " + showDominoes);
+		// wenn die Runde nicht blockiert ist
 		if (!endRound)
-			makeMove(showDominoes, player);
+			makeMove(showDominoes, player); 
 		else
 			endRound();
 	}
 	
+	/**
+	 * Es werden entweder die Steine des aktuellen Spielers angezeigt
+	 * oder wenn der Spieler nicht legen ist der naechste Spieler an der Reihe
+	 * @param showDominoes - wenn true sollen die Steine angezeigt werden<br>
+	 * wenn false ist der naechste Spieler an der Reihe
+	 * @param player - der aktuelle Spieler
+	 */
 	private void makeMove(boolean showDominoes, Player player)
 	{
 		if (showDominoes)
@@ -166,17 +202,24 @@ public class DominoGame
 		}
 	}
 	
+	/**
+	 * Beendet eine Runde
+	 */
 	private void endRound()
 	{
+		// Berechnung des Gewinners und dessen Punkte
 		int winnerPoints = DominoRules.calculateRoundPoints(allPlayers, true);
 		int winner = DominoRules.calculateRoundPoints(allPlayers, false);
 
 		String winnerString = "Spieler " + (winner+1) + " gewinnt die Runde";
 		String pointsString = "und erhält " + winnerPoints + " Punkte";
 		
+		// Anzeige des Gewinners und seiner Punkte auf dem Bildschirm
 		view.showGameInfo(winnerString, pointsString, 40f, 0, true);
 		view.updatePlayerPoints(allPlayers[winner], winner);
 		
+		// wenn der Rundengewinner weniger Punkte hat als die zum
+		// Spielgewinn benoetigten, wird die naechste Runde gestartet
 		if (allPlayers[winner].getPoints() < winningPoints)
 		{
 			resetRound();
@@ -184,32 +227,37 @@ public class DominoGame
 			initializeDominoes();
 			initializeHands();
 			initializeTalon();
+			// Spieler auswaehlen, der die naechste Runde beginnt
 			currentPlayerIndex = chooseBeginner();
 			
+			// Runde um 1 erhoehen
 			round++;
 			
 			startMove();
 		}
+		// sonst steht der Gewinner des Spiels fest und das Spiel endet
 		else
 			endGame(winner+1);
 	}
 
 	/**
-	 * 
-	 * @param winner
+	 * Das Spiel ist beendet und der Gewinner wird bekannt gegeben
+	 * @param winner - Index des Gewinners + 1
 	 */
 	private void endGame(int winner)
 	{
+		// Das Fenster zuruecksetzen, damit der Text besser lesbar ist
 		view.resetWindow();
 		String text1 = "Herzlichen Glückwunsch Spieler " + winner;
 		String text2 = "Sie haben gewonnen!";
 		view.updateButton(false, "Spiel beendet");
+		// Bekanntgabe des Gewinners
 		view.showGameInfo(text1, text2, 60f, 0, true);
 		view.showGameInfo("Toll gemacht", "Vielen Dank für's Spielen!", 80f, 2100, false);
 	}
 	
 	/**
-	 * Setzt alle relevante Instanzvariablen zurueck, bevor die naechste Runde
+	 * Setzt alle relevanten Instanzvariablen zurueck, bevor die naechste Runde
 	 * gestartet wird
 	 */
 	private void resetRound()
@@ -229,35 +277,45 @@ public class DominoGame
 			p.resetNoStones();
 		}
 		
+		hasSpinner = false;
+		spinner = null;
 		playedDominoes = 0;
 		mouseHandler.panelOffsetX = 0;
 		
 		view.resetWindow();
 	}
 	
+	/**
+	 * Erstellt die 28 Dominosteine
+	 */
 	private void initializeDominoes()
 	{
-		int x = 0;
-		int y = 0;
 		int w = 100;
 		int h= 50;
 		int current = 0;
 		
-		for (x = 0; x <= 6; x++)
-		{
-			for (y = 0; y <= 6; y++)
+		// Aeussere Schleife (linke Augenzahl)
+		for (int x = 0; x <= 6; x++)
+		{	// Innere Schleife (rechte Augenzahl)
+			for (int y = 0; y <= 6; y++)
 			{
+				/* wenn die innere Schleife neu beginnt, wird
+				 deren Schleifenzaehler auf den aktuellen 
+				 Wert des aeusseren Zaehlers gesetzt */
 				if (y == 0)
 					y = x;
 				
+				// Erzeugt den Dominostein und legt Augenzahlen und Groesse fest
 				allStones[current] = new Stone(x, y, new Dimension(w, h));
+				// Laedt das passende Bild
 				allStones[current].loadIcon();
 				
+				// Dieser Zaehler zaehlt durch die Schleifen bedingt von 0 bis 27
 				current++;
 			}
 		}
 		
-		// Ausgabe bevor gemischt wurde
+		// Konsolenausgabe bevor gemischt wurde
 		for (Stone n : allStones)
 		{
 			System.out.println(n.getPips1() + "|" + n.getPips2() + " = " + n.getValue() + " | DS: " + n.isDoublestone());
@@ -279,14 +337,19 @@ public class DominoGame
 	 */
 	private void shuffleDominoes()
 	{
+		// Anlegen einer ArrayList, die spaeter gemischt wird
 		ArrayList<Stone> stoneShuffler = new ArrayList<Stone>();
 		
+		// Laedt alle Dominosteine in die ArrayList
 		for(Stone s : allStones)
 		{
 			stoneShuffler.add(s);
 		}
 		
+		// Mischen der Steine mithilfe der shuffle Methode fuer ArrayLists
 		Collections.shuffle(stoneShuffler);
+		
+		// Zurueckschieben der Steine in das Array
 		int z = 0;
 		
 		for (Stone s : stoneShuffler)
@@ -296,27 +359,45 @@ public class DominoGame
 		}
 	}
 	
+	/**
+	 * Auswahl des Spielers, der die Runde beginnt
+	 * Der Spieler mit dem hoechsten Doppelstein beginnt
+	 * Hat kein Spieler einen Doppelstein, beginnt der
+	 * Spieler der ansonsten den hoechstwertigsten Stein hat
+	 * @return - Der Index des Beginners
+	 */
 	private int chooseBeginner()
 	{
+		// Anlegen einer Variable fuer den hoechsten Stein
 		Stone highest = null;
 		
+		// Schleife durch alle Spieler
 		for (Player p: allPlayers)
 		{
+			// Schleife durch alle Steine auf der Hand
 			for (Stone s: p.getHand())
 			{
+				// wenn der Stein ein Doppelstein ist
 				if (s.isDoublestone() == true)
 				{
-						if (highest != null)
-						{
-							if (s.getValue() > highest.getValue())
-								highest = s;
-						}
-						else
-							highest = s;
+					// wenn es bereits einen hoechsten Stein gibt
+					if (highest != null)
+					{
+						/* wird ersetzt, wenn sein Wert hoeher ist
+						 * als der Wert des aktuell hoechsten Steins */
+						if (s.getValue() > highest.getValue())
+							highest = s; 
+					}
+					// wenn noch kein Stein der hoechstwertigste ist
+					else
+						// wird der aktuelle Stein der hoechstwertigste
+						highest = s;
 				}
 			}
 		}
 		
+		/* wenn kein Spieler einen Doppelstein auf der Hand hat
+		werden die normalen Steine ueberprueft*/
 		if (highest == null)
 		{
 			for (Player p: allPlayers)
@@ -334,6 +415,7 @@ public class DominoGame
 			}
 		}
 		
+		// auswerten der vorrangegangenen Pruefung und bestimmen des Beginners
 		int beginnerIndex = 0;
 		
 		for (Player p: allPlayers)
@@ -359,40 +441,59 @@ public class DominoGame
 		}
 	}
 	
+	/**
+	 * Initialisiert die Haende der Spieler
+	 */
 	private void initializeHands()
 	{
 		int numStones;
 		int numPlayers = allPlayers.length;
 		int playerID = 0;
 		
+		// wenn 2 Spieler spielen bekommt jeder zu Anfang 7 Steine
 		if (numPlayers == 2)
 			numStones = 7;
+		// sonst bekommt jeder 5 Steine
 		else
 			numStones = 5;
 		
+		// Schleife durch alle Spieler
 		for (Player p: allPlayers)
 		{
 			view.textOut("");
-			
+			// Schleife durch alle Spieler
 			for (int i = 0; i < numStones; i++)
 			{
+				/* um zu vermeiden, dass mehrere Spieler identische Steine
+				bekommen koennen bekommt zum Beispiel bei 2 Spielern jeder
+				Spieler jeden zweiten Stein aus allStones bei 3 Spielern
+				jeden dritten usw.*/
 				int pos = playerID + (numPlayers*i);
 				
 				p.addStone(allStones[pos]);
 				allStones[pos].setPlayer(p);
 				
-				view.textOut(p.getName() + " Stein " + (i+1) + ": " + allStones[pos].getPips1() + "|" + allStones[pos].getPips2());
+				view.textOut(p.getName() + " Stein " + (i+1) + ": "
+				+ allStones[pos].getPips1() + "|" + allStones[pos].getPips2());
 			}
 			playerID++;
 		}
 	}
 	
+	/**
+	 * Initialisierung des Pools aus dem die Spieler ziehen koennen,
+	 * wenn sie nicht legen koennen
+	 */
 	private void initializeTalon()
 	{
+		/* den Talon zu beginn leeren, weil zu Beginn einer neuen
+		Runde noch Steine enthalten sein koennten */
 		talon.clear();
 		
+		// Schleife durch alle Steine
 		for (Stone s: allStones)
 		{
+			// wenn ein Stein keinem Spieler gehoert kann er in den Talon
 			if (s.getPlayer() == null)
 				talon.add(s);
 		}
@@ -401,7 +502,8 @@ public class DominoGame
 		
 		for (Stone s: talon)
 		{
-			view.textOut("Talon " + (talon.indexOf(s)+1) + ": " + s.getPips1() + "|" + s.getPips2());
+			view.textOut("Talon " + (talon.indexOf(s)+1) + ": " 
+						+ s.getPips1() + "|" + s.getPips2());
 		}
 	}
 	
@@ -426,34 +528,45 @@ public class DominoGame
 	 */  
 	public class MouseClickMotionListener implements MouseListener, MouseMotionListener
 	{
+		/** Speichert die Mausposition */
 		private PointerInfo mousePos;
+		/** Der Stein, den der Spieler gerade legt */
 		private DominoLabel draggedStone;
+		/** Der Stein, an den der Spieler anlegen will */
 		private DominoLabel target;
-		/** Die derzeit gedueckte Maustaste */
+		/** Die derzeit gedrueckte Maustaste */
 		private int pressedButton;
+		/** Die Koordinaten bei denen begonnen wurde das Spielfeld zu verschieben */
 		private int draggedAtX, draggedAtY;
+		/** Die Versatz des Ursprungs des Spielfeldes zum Ursprung des Haupfensters */
 		private int panelOffsetX = 0, panelOffsetY = 0;
 		
 		@Override
 		public void mouseDragged(MouseEvent e)
-		{
-			mousePos = MouseInfo.getPointerInfo();
+		{	
+			// erhalten der aktuellen Koordinaten des Cursors
+			mousePos = MouseInfo.getPointerInfo();	
 			int mouseX = mousePos.getLocation().x;
 			int mouseY = mousePos.getLocation().y;
 			int offsetX, offsetY;
 			
 			view.showMousePosition(mouseX, mouseY);
 			
+			// wenn die linke Maustaste gedrueckt gehalten wird
 			if (pressedButton == 1)
-			{
+			{	
+				/* wenn die Maustaste ueber einem Stein gedrueckt gehalten und
+				die Maus verschoben wird */
 				if (e.getSource() instanceof DominoLabel)
 				{
 					DominoLabel dLabel = (DominoLabel) e.getSource();
-					
+
+					// wenn der Stein verschiebbar ist
 					if (dLabel.isDraggable())
 					{
+						// Ursprungskoordinaten des Hauptfensters holen
 						Point origin = view.getFrameCoordinates();
-						
+						 
 						draggedStone = dLabel;
 						
 						// Offset berechnen, wenn der Stein horizontal gedreht ist
@@ -469,21 +582,25 @@ public class DominoGame
 							offsetY = panelOffsetY + dLabel.getHeight() - (origin.y + 175);
 						}
 						
-						
+						// Stein an die Position des Mauszeigers verschieben
+						// (Stein "klebt" am Cursor)
 						dLabel.setLocation(offsetX + mouseX, offsetY + mouseY);
 						
+						// pruefen, ob sich Steine ueberschneiden
 						view.checkIntersection(draggedStone, false, edgePoints, doublePoints);
+						/* laesst sich den Stein zurueckgeben mit dem sich der Stein,
+						der "an der Maus klebt" gerade ueberschneidet */
 						target = view.getCurrentTarget();
-						
-//						if (target == null)
-//							draggedStone.getStone().clearNeighbours();
 					}
 					else
 						view.textOut("Dieser Stein laesst sich nicht mehr verschieben");
 				}
 			}
+			// wenn die rechte Maustaste gedrueckt gehalten wird
 			else if (pressedButton == 3)
 			{
+				/* wenn die rechte Maustaste auf einer freien Flaeche des Spielfeldes
+				gedrueckt gehalten wird */
 				if (e.getSource() instanceof JPanel)
 				{
 					view.textOut("JPanel gedraggt");
@@ -492,16 +609,22 @@ public class DominoGame
 					
 					view.textOut("OnScreen: " + p.getLocationOnScreen());
 					view.textOut("MausPos: " + mousePos.getLocation().x + "|" + mousePos.getLocation().y);
+					
+					/* den Ursprungsort der Verschiebung auf den Punkt setzen, an dem man angefangen hat
+					die rechte Maustaste gedrueckt zu halten */
 					e.translatePoint(draggedAtX, draggedAtY);
+					// hier "klebt" das Spielfeld am Cursor und kann verschoben werden
 					p.setLocation(mouseX - (draggedAtX + origin.x) + 320, mouseY - (draggedAtY + origin.y) + 178);
 					
+					/* das Offset wird auch mit verschoben, damit es bei weiterem Verschieben des Spielfeldes
+					nicht zu Sprüngen kommt */
 					panelOffsetX = - p.getLocation().x;
 					panelOffsetY = - p.getLocation().y;
 					view.textOut("panelOffset: " + panelOffsetX + "|" + panelOffsetY);
 				}
 			}
 			
-			view.updatePanels();
+			view.updatePanels();	// Die Grafik des Fensters auffrischen, um Anzeigefehlern vorzubeugen
 			e.consume();
 		}
 
@@ -511,6 +634,7 @@ public class DominoGame
 			mousePos = MouseInfo.getPointerInfo();
 			view.showMousePosition(mousePos.getLocation().x, mousePos.getLocation().y);
 			
+			// das Offset des Spielfeldes neu berechnen, wenn es noch nicht berechnet wurde
 			if (e.getSource() instanceof JPanel && panelOffsetX == 0)
 			{
 				JPanel p = (JPanel) e.getSource();
@@ -524,73 +648,75 @@ public class DominoGame
 		@Override
 		public void mouseClicked(MouseEvent e)
 		{
-			view.textOut("Geklickt!");
-			
+			// wenn die rechte Maustaste geklickt wurde
 			if (e.getButton() == 1)
 			{
 				Object c = e.getSource();
-				
+				// wenn ein Spielstein angeklickt wurde
 				if (c instanceof DominoLabel)
 				{
 					DominoLabel clickedStoneLabel = (DominoLabel) c;
 					Stone clickedStone = clickedStoneLabel.getStone();
+					Player player = allPlayers[currentPlayerIndex];
 					
 					// Es wird geprueft, ob der angeklickte Stein noch auf der Hand des Spielers ist
 					if (clickedStoneLabel.getParent().getName() == "Hand")
 					{
-						System.err.println("DroppedStone: " + allPlayers[currentPlayerIndex].isDroppedStone());
+						// wenn der angeklickte Stein aufs Feld gelegt werden kann
 						if (DominoRules.checkIfDroppable(clickedStone, edgePoints, spinner, playedDominoes) && 
-															!allPlayers[currentPlayerIndex].isDroppedStone())
+															!player.isDroppedStone())
 						{
 							view.textOut("Kann gelegt werden");
+							// der Stein wird von der Hand aufs Spielfeld gelegt
 							view.dropFromHand(clickedStoneLabel, panelOffsetX, panelOffsetY, playedDominoes);
+							// der Stein wird von der Hand des Spielers geloescht
 							clickedStone.getPlayer().deleteStone(clickedStone);
-							allPlayers[currentPlayerIndex].setDroppedStone(true);
+							// der Spieler hat einen Stein gelegt und kann in diesem Zug keinen weiteren mehr legen
+							player.setDroppedStone(true);
 							
-							// Wird nur beim ersten Stein der gelegt wird aufgerufen
+							// wird nur beim ersten Stein der gelegt wird aufgerufen
 							if (playedDominoes == 0)
 							{
+								// gelegte Steine um 1 erhoehen
 								playedDominoes++;
+								// der Stein laesst sich nicht mehr verschieben
 								clickedStoneLabel.setNotDraggable();
+								// Punktzahlen setzen
 								DominoRules.firstStone(clickedStone, edgePoints, doublePoints);
+								// wenn der gelegte Stein ein Spinner ist wird hasSpinner auf true gesetzt
 								hasSpinner = clickedStone.isSpinner();
 								
+								// ist ein Spinner auf dem Feld wird dieser im Spiel gespeichert
 								if (hasSpinner)
 									spinner = clickedStone;
 								
+								// Punkte im Fenster anzeigen
 								view.firstPoints(edgePoints, doublePoints);
-								int points = view.updatePoints(true);
+								view.updatePoints(true);
 								
-								if (!DominoRules.calculatePlayerPoints(points, allPlayers[currentPlayerIndex]))
+								// Spielerpunkte berechnen
+								if (!DominoRules.calculatePlayerPoints(edgePoints, doublePoints, player, true))
 									System.err.println("Schade, leider diesmal keine Punkte");
 								
-								if (allPlayers[currentPlayerIndex].getPoints() >= winningPoints)
+								// wenn der Spieler genug Punkte hat, um das Spiel zu gewinnen endet das Spiel
+								if (player.getPoints() >= winningPoints)
 									endGame(currentPlayerIndex+1);
 								
-								System.err.println("Punkte " + allPlayers[currentPlayerIndex].getName() + ": " + allPlayers[currentPlayerIndex].getPoints());
-								view.updatePlayerPoints(allPlayers[currentPlayerIndex], currentPlayerIndex);
+								// Spielerpunkte im Fenster anzeigen
+								view.updatePlayerPoints(player, currentPlayerIndex);
 								
+								// Hand im Fenster loeschen, Spieler wechseln und naechsten Zug starten
 								view.clearHand();
 								currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
 								startMove();
 							}
 						}
-						else
-							view.textOut("Kann nicht gelegt werden");
 					}
-					
-					System.err.println("Yeah, ich habe auf ein DominoLabel geklickt!");
-					view.textOut("Stein " + clickedStone.getPips1() + "|" + clickedStone.getPips2() + " vertikal: " + clickedStone.isVertical() + ", spinner: " + clickedStone.isSpinner());
 				}
-				
-				else if (c instanceof JLabel)
-					view.textOut("Yeah, ich habe auf ein JLabel geklickt!");
-				
 				
 				if (c instanceof JPanel)
 				{
 					JPanel p = (JPanel) c;
-					
 					
 					if (p.getName() != "Hand")
 					{
@@ -607,13 +733,12 @@ public class DominoGame
 							
 						*/
 					}
-					
-					else
-						view.textOut("Man klickt nicht auf die Hand, das tut weh!");
 				}
 			}
-			view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
-			view.textOut(doublePoints[0] + ", " + doublePoints[1] + ", " + doublePoints[2] + ", " + doublePoints[3]);
+			view.textOut(edgePoints[0] + ", " + edgePoints[1] 
+						+ ", " + edgePoints[2] + ", " + edgePoints[3]);
+			view.textOut(doublePoints[0] + ", " + doublePoints[1] 
+						+ ", " + doublePoints[2] + ", " + doublePoints[3]);
 			
 			e.consume();			
 		}
@@ -621,13 +746,16 @@ public class DominoGame
 		@Override
 		public void mouseEntered(MouseEvent e)
 		{
+			// wenn der Cursor ueber einem Stein ist
 			if (e.getSource() instanceof DominoLabel)
 			{
 				DominoLabel label = (DominoLabel) e.getSource();
 				
+				// Auf der Konsole ausgeben, ob ein Stein legbar ist oder nicht (fuer Debugging)
 				if (label.getParent().getName() == "Hand")
 				{
-					view.textOut("" + DominoRules.checkIfDroppable(label.getStone(), edgePoints, spinner, playedDominoes));
+					view.textOut("" + DominoRules.checkIfDroppable(label.getStone(),
+									edgePoints, spinner, playedDominoes));
 					view.textOut("" + label.getStone().toString());
 				}
 			}
@@ -642,6 +770,9 @@ public class DominoGame
 		@Override
 		public void mousePressed(MouseEvent e)
 		{
+			/* wenn eine Maustaste auf einer frei Flaeche
+			des Spielfeldes grueckt gehalten wird, aber die Maus
+			nicht verschoben wird */
 			if (e.getSource() instanceof JPanel)
 			{
 				draggedAtX = e.getX() + 323;
@@ -649,8 +780,12 @@ public class DominoGame
 			}
 			
 			view.textOut("draggedAt: " + draggedAtX + "|"+ draggedAtY);
+			
+			// gedrueckte Maustaste speichern fuer spaetere Abfragen
 			pressedButton = e.getButton();
 			
+			/* Cursor aendern, wenn die rechte Maustaste ueber dem
+			Spielfeld gedrueckt gehalten wird */
 			if (pressedButton == 3 && e.getSource() instanceof JPanel)
 			{
 				JPanel p = (JPanel) e.getSource();
@@ -665,64 +800,87 @@ public class DominoGame
 			boolean endRound = false;
 			boolean endGame = false;
 			
+			/* wenn die Maustaste ueber dem Spielfeld losgelassen wurde
+			wird der Standardcursor wiederhergestellt */
 			if (e.getSource() instanceof JPanel)
 			{
 				JPanel p = (JPanel) e.getSource();
 				p.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 			
+			// wenn die linke Maustaste losgelassen wurde und bereits Steine gelegt wurden
 			if (pressedButton == 1 && playedDominoes > 0)
 			{
 				// bekommt von checkIntersections zurueck, ob der Stein gesnappt hat
 				boolean hasSnapped = false;
+				Player player = allPlayers[currentPlayerIndex];
 				
 				if (draggedStone != null)
-					view.textOut("DraggedStone: " + draggedStone.getStone().getPips1() + "|" + draggedStone.getStone().getPips2());
+					view.textOut("DraggedStone: " + draggedStone.getStone().getPips1()
+									+ "|" + draggedStone.getStone().getPips2());
 				
-				if (target != null && draggedStone != null && draggedStone.getParent().getName() != "Hand")
+				// wenn ein Stein ueber einem anderen Stein auf dem Spielfeld losgelassen wurde
+				if (target != null && draggedStone != null 
+					&& draggedStone.getParent().getName() != "Hand")
 				{
 					view.textOut("Es gibt ein target");
 					
+					// wenn der Zug moeglich ist
 					if (DominoRules.checkPossibleMove(target.getStone(), draggedStone))
 					{
+						// wenn noch kein Spinner auf dem Feld liegt
 						if (spinner == null)
 						{
+							/* wenn der gelegte Stein ein Spinner ist, wird er
+							dem Spiel hinzugefuegt */
 							spinner = DominoRules.checkSpinner(draggedStone, target, hasSpinner);
 							if (spinner != null)
 								hasSpinner = true;
 						}
 						
-						hasSnapped = view.checkIntersection(draggedStone, true, edgePoints, doublePoints);
-						view.textOut("Target: " + target.getStone().getPips1() + "|" + target.getStone().getPips2());
+						// wenn ein Stein angelegt wurde, wird hasSnapped auf true gesetzt
+						hasSnapped = view.checkIntersection(draggedStone, true,
+															edgePoints, doublePoints);
+						view.textOut("Target: " + target.getStone().getPips1()
+										+ "|" + target.getStone().getPips2());
 					}
 					
-					// soll nur ausgefuehrt werden, wenn ein Stein angelegt wurde
+					// wenn ein Stein angelegt wurde
 					if (hasSnapped)
 					{
-						playedDominoes++;
+						playedDominoes++;	// gelegte Steine um 1 erhoehen
 						
-						if (!DominoRules.calculatePlayerPoints(edgePoints, doublePoints, allPlayers[currentPlayerIndex]))
+						// Berechnung der Spielerpunkte und Debugausgabe
+						if (!DominoRules.calculatePlayerPoints(edgePoints, doublePoints,
+																		player, false))
 							System.err.println("Schade, leider diesmal keine Punkte");
 						
-						System.err.println("Punkte " + allPlayers[currentPlayerIndex].getName() + ": " + allPlayers[currentPlayerIndex].getPoints());
+						System.err.println("Punkte " + player.getName() + ": "
+											+ player.getPoints());
 						
-						if (allPlayers[currentPlayerIndex].getPoints() >= winningPoints)
+						/* wenn ein Spieler genug Punkte hat, um das Spiel zu
+						gewinnen endet das Spiel*/
+						if (player.getPoints() >= winningPoints)
 							endGame = true;
 						
-						view.updatePlayerPoints(allPlayers[currentPlayerIndex], currentPlayerIndex);
+						// Punkte im Fenster anzeigen
+						view.updatePlayerPoints(player, currentPlayerIndex);
 						view.clearHand();
 						
 						// wenn ein Spieler keine Steine mehr hat, endet die Runde
-						if (allPlayers[currentPlayerIndex].isNoStones())
+						if (player.isNoStones())
 						{
 							endRound = true;
 						}
+						// sonst ist der naechste Spieler am Zug
 						else
 						{
-							currentPlayerIndex = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);
+							currentPlayerIndex = DominoRules.switchPlayer(allPlayers,
+																		currentPlayerIndex);
 							startMove();
 						}
 					}
+					// wenn der Stein nicht angelegt wurde springt er ein Stueck zur Seite
 					else
 						if (target != null)
 						{
@@ -730,19 +888,21 @@ public class DominoGame
 							view.checkIntersection(draggedStone, false, edgePoints, doublePoints);
 						}
 				}
-				else
-				{
-					view.textOut("Es gibt leider kein target");
-				}
 				
+				// die Variable fuer den zu legenden Stein wieder auf null setzen
 				draggedStone = null;
 			}
-			view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " + edgePoints[2] + ", " + edgePoints[3]);
-			view.textOut(doublePoints[0] + ", " + doublePoints[1] + ", " + doublePoints[2] + ", " + doublePoints[3]);
+			// Debugausgaben
+			view.textOut(edgePoints[0] + ", " + edgePoints[1] + ", " 
+							+ edgePoints[2] + ", " + edgePoints[3]);
+			view.textOut(doublePoints[0] + ", " + doublePoints[1] + ", "
+							+ doublePoints[2] + ", " + doublePoints[3]);
 			
+			// wenn das Spiel beendet werden soll
 			if (endGame == true)
 				endGame(currentPlayerIndex+1);
 			
+			// wenn die Runde beendet ist
 			if (endRound == true)
 			{
 				endRound();
@@ -751,33 +911,45 @@ public class DominoGame
 		}
 	}
 	
+	/**
+	 * Der Listener fuer den Button zum ziehen der Steine aus dem Talon 
+	 */
 	public class ButtonListener	implements ActionListener 
 	{
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
+			// es wird der erste Stein aus dem Talon geholt
 			Stone stone = talon.get(0);
 			Player player = allPlayers[currentPlayerIndex];
 			
+			view.textOut(player.getName() + player.getHand().size());
+			// der Stein wird aus dem Talon geloescht 
 			talon.remove(stone);
-			stone.setPlayer(player);
+			// der Stein wird dem Spieler hinzugefuegt
 			player.addStone(stone);
+			stone.setPlayer(player);
+			// der Stein wird im Fenster angezeigt
 			view.addDominoeToHand(stone, true);
 			
-			if (DominoRules.checkIfDroppable(stone, edgePoints, spinner, playedDominoes))
+			view.textOut(player.getName() + player.getHand().size());
+			// wenn der Stein auf dem Feld angelegt werden kann
+			if (DominoRules.checkIfDroppable(stone, edgePoints,
+											 spinner, playedDominoes))
 			{
+				// der Button wird deaktiviert, damit man nicht mehr ziehen kann
 				view.updateButton(false, "");
+				// der Spieler ist nicht mehr blockiert
 				player.setBlocked(false);
 			}
-			else
-			{
-				view.textOut("Spieler blockiert: " + player.isBlocked());
-			}
 			
+			// wenn der Talon leer ist...
 			if (talon.isEmpty())
 			{
+				// ...wird das auf dem Button angezeigt...
 				view.updateButton(false, "Der Talon ist leer");
 				
+				// ...und der naechste Spieler ist am Zug
 				if (player.isBlocked())
 				{
 					int otherPlayer = DominoRules.switchPlayer(allPlayers, currentPlayerIndex);

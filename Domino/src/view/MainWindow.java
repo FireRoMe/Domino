@@ -2,7 +2,6 @@ package view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -36,12 +35,16 @@ import control.DominoGame.ButtonListener;
 import control.DominoGame.MouseClickMotionListener;
 import control.DominoRules;
 
+/**
+ * Das Hauptfenster des Spiels 
+ */
 public class MainWindow
 {
 	/** Die paintingComponent rendert jeden Frame */
 	private PaintingComponent paintingComponent = new PaintingComponent();
 	/** Eine Liste der Bilder der Dominosteine, die gerendert werden sollen */
 	private ArrayList<RenderImage> renderedImages = new ArrayList<RenderImage>();
+	/** Das Fenster selbst */
 	private JFrame frame;
 	private MouseClickMotionListener mouseHandler;
 	private ButtonListener buttonListener;
@@ -62,7 +65,14 @@ public class MainWindow
 	private JPanel handPane = new JPanel();
 	private JPanel contentPane;
 	
-	public void initializeWindow(Stone[] allStones, MouseClickMotionListener mouseHandler, ButtonListener buttonListener)
+	/**
+	 * Initialisiert alle Komponenten
+	 * @param allStones
+	 * @param mouseHandler
+	 * @param buttonListener
+	 */
+	public void initializeWindow(Stone[] allStones,
+				MouseClickMotionListener mouseHandler, ButtonListener buttonListener)
 	{
 		this.mouseHandler = mouseHandler;
 		this.buttonListener = buttonListener;
@@ -71,9 +81,12 @@ public class MainWindow
 
 		scrollPane.setBounds(-2, 734, 1600, 141);
 		
-		JLabel lbl_help1 = new JLabel("Rechte Maustaste gedrueckt halten, um das Spielfeld zu verschieben");
-		JLabel lbl_help2 = new JLabel("Mit linker Maustaste auf einen Stein im unteren Feld klicken, um ihn zu legen");
+		JLabel lbl_help1 = new JLabel("Rechte Maustaste "
+				+ "gedrueckt halten, um das Spielfeld zu verschieben");
+		JLabel lbl_help2 = new JLabel("Mit linker Maustaste "
+				+ "auf einen Stein im unteren Feld klicken, um ihn zu legen");
 		
+		//Initialisierung aller Kompontenten
 		contentPane.setLayout(null);
 		contentPane.setBounds(0, 0, 1600, 900);
 		contentPane.add(lbl_mouseX);
@@ -117,6 +130,7 @@ public class MainWindow
 		btn_drawTalon.setBounds((contentPane.getWidth()/2) - 77, scrollPane.getY() - 40, 155, 40);
 		btn_drawTalon.addActionListener(buttonListener);
 		
+		// FlowLayout fuer die ScrollPane, damit die Steine nebeneinander angeordnet werden
 		FlowLayout flow = new FlowLayout();
 		flow.setVgap(10);
 		flow.setHgap(15);
@@ -135,77 +149,12 @@ public class MainWindow
 		graphicsPane.addMouseListener(mouseHandler);
 		graphicsPane.addMouseMotionListener(mouseHandler);
 		
-		BufferedImage img = null;
-		BufferedImage imgTP = null;
-		BufferedImage imgTP2 = null;
-		
-		ImageIcon iIcon1 = new ImageIcon();
-		ImageIcon iIcon2 = new ImageIcon();
-		ImageIcon iIcon3 = new ImageIcon();
-		ImageIcon iIcon4 = new ImageIcon();
-		
-		try {
-			img = ImageIO.read(new File("ImageSrc/SteinTest.jpg"));
-			imgTP = ImageIO.read(new File("ImageSrc/transparenzTest4.png"));
-			imgTP2 = ImageIO.read(new File("ImageSrc/transparenzTest2.png"));
-			lbl_points.setIcon(new ImageIcon("ImageSrc/BG_Points.png"));
+		lbl_points.setIcon(new ImageIcon("ImageSrc/BG_Points.png"));
 			
-			Image steinIcon = allStones[15].getIcon();
+		graphicsPane.add(paintingComponent);
 			
-			iIcon1.setImage(img.getScaledInstance(50, 100, Image.SCALE_DEFAULT));
-			iIcon2.setImage(imgTP.getScaledInstance(150, 75, Image.SCALE_DEFAULT));
-			//iIcon3.setImage(imgTP2.getScaledInstance(36, 75, Image.SCALE_DEFAULT));
-			iIcon4.setImage(steinIcon.getScaledInstance(75, 150, Image.SCALE_DEFAULT));
+		paintingComponent.setSize(new Dimension(graphicsPane.getWidth(), graphicsPane.getHeight()));
 			
-			JLabel imageLabel = new JLabel(iIcon1);
-			JLabel imageLabel2 = new JLabel(iIcon2);
-			JLabel imageLabel3 = new JLabel(iIcon4);
-			
-			imageLabel.addMouseListener(mouseHandler);
-			
-			addDominoe(allStones[25], 10, graphicsPane.getHeight() - (allStones[25].getIcon().getHeight(null)*2 + 45));
-			textOut("dLabels Size: " + dLabels.size());
-			addDominoe(allStones[26], dLabels.get(dLabels.size() - 1).getWidth() + 20, dLabels.get(dLabels.size() - 1).getY());
-			textOut("dLabels Size: " + dLabels.size());
-			addDominoe(allStones[27], dLabels.get(dLabels.size() - 1).getWidth() + 130, dLabels.get(dLabels.size() - 1).getY());
-			
-			graphicsPane.add(paintingComponent);
-//			contentPane.add(imageLabel);
-			//contentPane.add(imageLabel3);
-			imageLabel.setBounds(15, 50, 100, 50);
-			
-			Rectangle rect = imageLabel.getBounds();
-			
-			int x = rect.x;
-			int y = rect.y;
-			int h = rect.height;
-			int w = rect.width;
-			
-			imageLabel2.setBounds(x+w+1, y, w, h);
-			imageLabel3.setBounds(x+2*(w+1), y, w, h);
-			
-			paintingComponent.setSize(new Dimension(graphicsPane.getWidth(), graphicsPane.getHeight()));
-			
-//			prepareRender(allStones[0].getIcon(), 0, new Dimension(x+w, (int) (y+0.75*h)), new Dimension(w, h));
-//			prepareRender(allStones[1].getIcon(), 59, new Dimension((int) (x+2*w-5), (int) (y+0.75*h + 10)), new Dimension(w, h));
-//			prepareRender(allStones[2].getIcon(), 0, new Dimension((int) (x+3*w+2), (int) (y+0.75*h)), new Dimension(w, h));
-//			prepareRender(allStones[3].getIcon(), 0, new Dimension((int) (x+4*w+3), (int) (y+0.75*h)), new Dimension(w, h));
-			
-			/*
-			paint.setImage(steinIcon);
-			paint.setDegrees(270);
-			paint.setImageSize(w, h);
-			paint.setPosX(x+w+1);		// X Fï¿½r Drehung um 270 Grad (anhand Position vom linken Nachbarn)
-			paint.setPosY(y+0.75*h);	// Y Fï¿½r Drehung um 270 Grad (anhand Position vom linken Nachbarn)
-			//paint.setPosX(x+3*w+1);	// X Fï¿½r Drehung um 90 Grad (anhand Position vom linken Nachbarn)
-			//paint.setPosY(y+0.25*h);	// Y Fï¿½r Drehung um 90 Grad (anhand Position vom linken Nachbarn)
-			*/
-			
-			System.out.println(rect.toString());
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		/*
 		 * Fenster anhand Bildschirmaufloesung zentriert ausrichten
 		 */
@@ -229,14 +178,10 @@ public class MainWindow
 		frame.setVisible(true);
 	}
 	
-	private void prepareRender(Image img, double degrees, Dimension pos, Dimension size)
-	{
-		RenderImage next = new RenderImage(img, degrees, pos, size);
-		
-		renderedImages.add(next);
-	}
-	
-	class PaintingComponent extends JComponent	//TODO Gucken, was davon weg kann
+	/**
+	 * Zeichnet Ueberschneidungen farbig auf das Spielfeld 
+	 */
+	class PaintingComponent extends JComponent
 	{
 		private static final long serialVersionUID = 1L;
 		private Object[] intersections;
@@ -250,9 +195,6 @@ public class MainWindow
 		{
 			super.paintComponent(g);	// Bevor gezeichnet wird, wird die Zeichenflaeche geleert.
 			
-			AffineTransform[] at = new AffineTransform[renderedImages.size()];
-			AffineTransform[] at2 = new AffineTransform[renderedImages.size()];
-			Image[] images = new Image[renderedImages.size()];
 			Rectangle[] rects = new Rectangle[renderedImages.size()];
 			Shape[] shapes = new Shape[renderedImages.size()];
 			Graphics2D g2d = (Graphics2D) g;
@@ -265,21 +207,13 @@ public class MainWindow
 				double w = ri.getSize().getWidth();
 				double h = ri.getSize().getHeight();
 				
-				at[i] = AffineTransform.getTranslateInstance(x, y);
-				at2[i] = new AffineTransform();
-				at[i].rotate(Math.toRadians(ri.getDegrees()));
-				at2[i].rotate(Math.toRadians(ri.getDegrees()), x, y);
-				
-				images[i] = ri.getImg().getScaledInstance((int) w, (int) h, Image.SCALE_SMOOTH);
 				rects[i] = new Rectangle((int)x, (int)y, (int)w, (int)h);
 				
 				Path2D.Double path = new Path2D.Double();
 				path.append(rects[i], false);
-				shapes[i] = path.createTransformedShape(at2[i]);
 				
 				g2d.setColor(Color.GREEN);
 				g2d.draw(shapes[i]);
-				g2d.drawImage(images[i], at[i], null);
 				
 				if (i >= 1)
 				{
@@ -327,11 +261,20 @@ public class MainWindow
 		}
 	}
 	
+	/**
+	 * Schreibt den uebergebenen Text auf die Konsole
+	 * @param s - Der Text der ausgegeben werden soll
+	 */
 	public void textOut(String s)
 	{
 		System.out.println(s);
 	}
 	
+	/**
+	 * Zeigt die Mausposition im Fenster an
+	 * @param x - Mausposition X
+	 * @param y - Mausposition Y
+	 */
 	public void showMousePosition(int x, int y)
 	{
 		lbl_mouseX.setText("Position X: " + x);
@@ -341,59 +284,15 @@ public class MainWindow
 		lbl_mouseY.setSize(lbl_mouseY.getText().length() * 6, 20);
 	}
 	
-	public int updatePoints(boolean firstStone)
+	/**
+	 * Aktualisiert die Punkteanzeige
+	 * @param firstStone - true wenn der erste Stein gelegt wird
+	 */
+	public void updatePoints(boolean firstStone)
 	{
-		int points = DominoRules.calculatePoints(lbl_points.getPoints(), lbl_points.getDoublePoints(), firstStone);
+		int points = DominoRules.calculatePoints(lbl_points.getPoints()
+									, lbl_points.getDoublePoints(), firstStone);
 		lbl_points.setText("Punkte: " + points);
-		
-		return points;
-	}
-	
-	/**
-	 * Fuegt der grpahicsPane einen Stein an der Mausposition hinzu
-	 * @param s - Der Dominostein, der hinzugefuegt werden soll
-	 * @param p - Die aktuellen Koordinaten des Mauszeigers
-	 */
-	public void addDominoe(Stone s, Point p)
-	{
-		textOut("addDominoe wurde aufgerufen");
-		
-//		if (s.isDoublestone())
-//			s.rotateImage(90);
-		
-		DominoLabel d = new DominoLabel(s);
-		dLabels.add(d);
-		d.setLocation(p);
-		d.addMouseListener(mouseHandler);
-		d.addMouseMotionListener(mouseHandler);
-		
-		graphicsPane.add(d, 0);
-		
-		checkIntersection(d, false, lbl_points.getPoints(), lbl_points.getDoublePoints());
-		updatePanels();
-	}
-	
-	/**
-	 * Fuegt zu Debugzwecken einen Stein zur graphicsPane hinzu
-	 * @param s - Der Dominostein, der hinzugefuegt werden soll
-	 * @param x - X-Koordinate
-	 * @param y - Y-Koordinate
-	 */
-	public void addDominoe(Stone s, int x, int y)
-	{
-		if (s.isDoublestone())
-			s.rotateImage(90);
-		
-		dLabels.add(new DominoLabel(s));
-		DominoLabel d = dLabels.get(dLabels.size()-1);
-		d.setLocation(x, y);
-		d.addMouseListener(mouseHandler);
-		d.addMouseMotionListener(mouseHandler);
-		
-		graphicsPane.add(d, 0);
-		
-		checkIntersection(d, false, lbl_points.getPoints(), lbl_points.getDoublePoints());
-		updatePanels();
 	}
 	
 	/**
@@ -409,30 +308,47 @@ public class MainWindow
 		// zwei identische Steine auf der Hand liegen koennen
 		for (DominoLabel h: handLabels)
 		{
-			if (h.getStone().hashCode() == s.hashCode())
+			if (h.getStone() == s)
 				abort = true;
 		}
 		
+		// wenn der Stein noch nicht auf der Hand ist
 		if (!abort)
 		{
+			/* wenn der Stein noch nicht gedreht ist,
+			aber gedreht werden muss wird er hier gedreht */
 			if (s.isDoublestone() && firstMove)
 				s.rotateImage(90);
 			
+			// Fuegt den Stein zu Liste der angezeigten Steine hinzu
 			handLabels.add(new DominoLabel(s));
 			DominoLabel d = handLabels.get(handLabels.size() -1);
 			
 			textOut("HandLabels Groesse: " + handLabels.size());
 				
+			// fuegt dem Stein den MouseListener hinzu
 			d.addMouseListener(mouseHandler);
 			d.addMouseMotionListener(mouseHandler);
 			
+			// fuegt den Stein zur Anzeige der handPane hinzu
 			handPane.add(d);
 			
+			// Grafik aktualisieren
 			updatePanels();
 		}
 	}
 	
-	public boolean checkIntersection(DominoLabel draggedStone, boolean released, int[] edgePoints, boolean[] doublePoints)
+	/**
+	 * Prueft ueberlappende Steine auf Ueberschneidungen
+	 * @param draggedStone - der Stein, der gelegt werden soll
+	 * @param released - true, wenn die Maustaste losgelassen wurde
+	 * @param edgePoints - die Kantenpunkte
+	 * @param doublePoints - haelt die Positionen der Doppelsteine
+	 * @return true - wenn es Ueberschneidungen gibt <br>
+	 * false - wenn nicht
+	 */
+	public boolean checkIntersection(DominoLabel draggedStone,
+						boolean released, int[] edgePoints, boolean[] doublePoints)
 	{
 		ArrayList<Shape> intersections = new ArrayList<Shape>();
 		ArrayList<Boolean> intersectionColors = new ArrayList<Boolean>();
@@ -446,26 +362,34 @@ public class MainWindow
 				break;
 			else
 			{
+				/* prueft fuer alle gelegten Steine,
+				ob es Ueberschneidungen gibt*/ 
 				for (int j = i+1; j < dLabels.size(); j++) 
 				{
-					if (dLabels.get(i).getBounds().intersects(dLabels.get(j).getBounds()))
+					if (dLabels.get(i).getBounds().intersects
+												(dLabels.get(j).getBounds()))
 					{
-						intersections.add(dLabels.get(i).getBounds().intersection(dLabels.get(j).getBounds()));
+						intersections.add(dLabels.get(i).getBounds().intersection
+													(dLabels.get(j).getBounds()));
 						
 						if (dLabels.get(j) == draggedStone)
 						{
 							targetLabel = dLabels.get(i);
-							intersectionColors.add(DominoRules.checkCompatibility(dLabels.get(j), targetLabel));
+							intersectionColors.add(DominoRules.checkCompatibility
+													(dLabels.get(j), targetLabel));
 						}
 						else if (dLabels.get(i) == draggedStone)
 						{
 							targetLabel = dLabels.get(j);
-							intersectionColors.add(DominoRules.checkCompatibility(dLabels.get(i), targetLabel));
+							intersectionColors.add(DominoRules.checkCompatibility
+													(dLabels.get(i), targetLabel));
 						}
 						else
-							intersectionColors.add(DominoRules.checkCompatibility(dLabels.get(i), dLabels.get(j)));
+							intersectionColors.add(DominoRules.checkCompatibility
+													(dLabels.get(i), dLabels.get(j)));
 					}
-					// wenn der nächste Wert der ArrayList leer ist soll es keinen weiteren Durchlauf geben
+					/* wenn der nächste Wert der ArrayList leer ist 
+					soll es keinen weiteren Durchlauf geben */
 					if ((j+1) > lastIndex)
 						break;
 				}
@@ -476,10 +400,13 @@ public class MainWindow
 		// wenn es mindestens eine Uberschneidung zwischen 2 Steinen gibt
 		if (!intersections.isEmpty())
 		{
-			// hier werden die Ueberschneidungen zum zeichnen an die paintingComponent uebergeben
-			paintingComponent.setIntersectionShapes(intersections.toArray(), intersectionColors.toArray());
+			/* hier werden die Ueberschneidungen zum zeichnen an 
+			die paintingComponent uebergeben */
+			paintingComponent.setIntersectionShapes(intersections.toArray(), 
+											intersectionColors.toArray());
 			
-			// wenn es mehrere Ueberschneidungen gibt, kann auch kein Stein angelegt worden sein
+			/* wenn es mehrere Ueberschneidungen gibt, kann auch 
+			kein Stein angelegt worden sein */
 			if (intersections.size() > 1)
 				return false;
 			
@@ -490,14 +417,17 @@ public class MainWindow
 				{
 					// wenn der Stein horizontal angelegt werden kann
 					if(!DominoRules.checkIfVertical(targetLabel))
-						return moveStoneHorizontal(draggedStone, targetLabel, intersectionColors, edgePoints, doublePoints);
+						return moveStoneHorizontal(draggedStone, targetLabel,
+								intersectionColors, edgePoints, doublePoints);
 					else
-						return moveStoneVertical(draggedStone, targetLabel, intersectionColors, edgePoints, doublePoints);
+						return moveStoneVertical(draggedStone, targetLabel,
+								intersectionColors, edgePoints, doublePoints);
 				}
 			}
 			
 			return false;
 		}
+		// wenn es keine Ueberschneidungen gibt
 		else
 		{
 			targetLabel = null;
@@ -506,11 +436,26 @@ public class MainWindow
 		}
 	}
 	
+	/**
+	 * Gibt den Stein zurueck, mit dem es aktuell
+	 * eine Ueberschneidung gibt
+	 * @return
+	 */
 	public DominoLabel getCurrentTarget()
 	{
 		return targetLabel;
 	}
 	
+	/**
+	 * Legt einen Stein horizontal an
+	 * @param draggedStone - der Stein, der gelegt werden soll
+	 * @param target - der Stein, an den angelegt werden soll
+	 * @param intersectionColors - Auswertung der Ueberschneidungen
+	 * @param edgePoints - die Punkte der offenen Kanten
+	 * @param doublePoints - weiß ob Punkte doppelt gezaehlt werden sollen
+	 * @return true - wenn der Stein angelegt wurde<br>
+	 * false - wenn nicht angelegt wurde
+	 */
 	private boolean moveStoneHorizontal(DominoLabel draggedStone, DominoLabel target, 
 			ArrayList<Boolean> intersectionColors, int[] edgePoints, boolean[] doublePoints)
 	{
@@ -521,6 +466,7 @@ public class MainWindow
 		// wenn die beiden Steine kompatibel sind
 		if (intersectionColors.get(0) == true && draggedStone.isDraggable() && noNeighbours)
 		{
+			// Steinpositionen und Groessen holen
 			int tPosX = target.getLocation().x;
 			int tPosY = target.getLocation().y;
 			int draggedWidth = draggedStone.getWidth();
@@ -528,25 +474,34 @@ public class MainWindow
 			int targetWidth = target.getWidth();
 			int targetHeight = target.getHeight();
 			
+			// wenn der Stein rechts angelegt werden soll
 			if (snapRight)
 			{
+				// wenn der Stein kein Doppelstein ist
 				if (!draggedStone.getStone().isDoublestone())
 				{
+					// wenn der Zielstein kein Doppelstein ist
 					if (!target.getStone().isDoublestone())
+						// Stein positionieren
 						draggedStone.setLocation(tPosX+draggedWidth, tPosY);
 					else
-						draggedStone.setLocation(tPosX+(draggedWidth/2), tPosY+(draggedHeight/2));
+						draggedStone.setLocation(tPosX+(draggedWidth/2),
+														tPosY+(draggedHeight/2));
 				}
+				// wenn der Stein ein Doppelstein ist
 				else
 				{
 					draggedStone.setLocation(tPosX+targetWidth, tPosY-(targetHeight/2));
 				}
 				
+				// Nachbarn festlegen
 				target.getStone().setRightNeighbour(draggedStone.getStone());
 				draggedStone.getStone().setLeftNeighbour(target.getStone());
 				
+				// Punkte berechnen
 				DominoRules.calculatePointsRight(draggedStone, target, edgePoints, doublePoints);
 			}
+			// wenn links angelegt werden soll
 			else
 			{
 				if (!draggedStone.getStone().isDoublestone())
@@ -567,17 +522,20 @@ public class MainWindow
 				DominoRules.calculatePointsLeft(draggedStone, target, edgePoints, doublePoints);
 				
 			}
+			// beide Steine nicht verschiebbar machen
 			draggedStone.setNotDraggable();
 			target.setNotDraggable();
 			// Ueberschneidungen neu berechnen, um Grafikfehler zu vermeiden
 			checkIntersection(draggedStone, false, edgePoints, doublePoints);		
 			
+			// Punkte im Fenster anzeigen
 			lbl_points.setPoints(edgePoints);
 			lbl_points.setDoublePoints(doublePoints);
 			updatePoints(false);
 			
 			return true;
 		}
+		// wenn nicht angelegt werden konnte 
 		else
 		{
 			textOut("Die Steine sind leider nicht kompatibel");
@@ -585,9 +543,21 @@ public class MainWindow
 		}
 	}
 
+	/**
+	 * Legt einen Stein horizontal an
+	 * @param draggedStone - der Stein, der gelegt werden soll
+	 * @param target - der Stein, an den angelegt werden soll
+	 * @param intersectionColors - Auswertung der Ueberschneidungen
+	 * @param edgePoints - die Punkte der offenen Kanten
+	 * @param doublePoints - weiß ob Punkte doppelt gezaehlt werden sollen
+	 * @return true - wenn der Stein angelegt wurde<br>
+	 * false - wenn nicht angelegt wurde
+	 */
 	private boolean moveStoneVertical(DominoLabel draggedStone, DominoLabel target, 
 			ArrayList<Boolean> intersectionColors, int[] edgePoints, boolean[] doublePoints)
 	{
+		// Kommentare aehnlich moveStoneVertical
+		
 		boolean snapTop = DominoRules.snapTop(draggedStone, target);
 		boolean noNeighbours = DominoRules.checkNeighboursVertical(draggedStone, target, snapTop);
 		
@@ -666,6 +636,9 @@ public class MainWindow
 		}
 	}
 	
+	/**
+	 * Aktualisiert die JPanels
+	 */
 	public void updatePanels()
 	{
 		contentPane.updateUI();
@@ -673,26 +646,46 @@ public class MainWindow
 		handPane.updateUI();
 	}
 	
+	/**
+	 * Gibt die Position des Hauptfensters auf dem Bildschirm zurueck
+	 * @return - Die absoluten Koordinaten des Ursprungs des Hauptfensters
+	 */
 	public Point getFrameCoordinates()
 	{
 		return frame.getLocationOnScreen();
 	}
-
-	public void dropFromHand(DominoLabel clickedStone, int offsetX, int offsetY, int playedDominoes)
+	
+	/**
+	 * Legt einen Stein von der Hand aufs Spielfeld
+	 * @param clickedStone - der angeklickte Stein
+	 * @param offsetX - das X-Offset des Spielfeldes
+	 * @param offsetY - das Y-Offset des Spielfeldes
+	 * @param playedDominoes - die Anzahl der gelegten Steine
+	 */
+	public void dropFromHand(DominoLabel clickedStone, int offsetX,
+									int offsetY, int playedDominoes)
 	{
 		Stone s = clickedStone.getStone();
 		Player p = s.getPlayer();
-		
+		textOut("Stein: " + s);
+		// den Stein von der Hand des Spielers loeschen
 		p.deleteStone(s);
 		
+		// den Stein vom JPanel Hand loeschen
 		handPane.remove(clickedStone);
 		handLabels.remove(clickedStone);
 		
+		// den Stein dem Spielfeld hinzufuegen
 		dLabels.add(clickedStone);
 		graphicsPane.add(clickedStone, 0);
 		
+		/*wenn bereits Steine gelegt wurden,
+		wird der Stein etwas ueber der Hand dargestellt */
 		if (playedDominoes != 0)
-			clickedStone.setLocation(offsetX + clickedStone.getX(), offsetY + 680 - clickedStone.getHeight());
+			clickedStone.setLocation(offsetX + clickedStone.getX(),
+						offsetY + 680 - clickedStone.getHeight());
+		/* wenn noch keine Steine gelegt wurden, wird der Stein
+		mittig auf dem Spielfeld dargestellt*/
 		else
 		{	
 			int halfSizeX = frame.getWidth()/2;
@@ -707,7 +700,7 @@ public class MainWindow
 	}
 	
 	/**
-	 * Loescht auf GUI alle Steine von der Hand
+	 * Loescht auf dem GUI alle Steine von der Hand
 	 */
 	public void clearHand()
 	{
@@ -717,12 +710,29 @@ public class MainWindow
 		updatePanels();		// Grafik auffrischen, um Aenderungen wirksam zu machen
 	}
 
+	/**
+	 * Uebergibt beim ersten Zug Referenzen von edgePoints
+	 * und doublePoints zur Punkteberechnung und -darstellung
+	 * an das PunkteLabel. Danach ist keine weitere Uebergabe dieser
+	 * Variablen mehr nötig, die diese noch mit der Hauptspielklasse
+	 * referenziert sind
+	 * @param edgePoints - haelt die Punktzahlen der offenen Kanten
+	 * @param doublePoints - speichert, an welcher offenen Kante ein Doppelstein liegt
+	 */
 	public void firstPoints(int[] edgePoints, boolean[] doublePoints)
 	{
 		lbl_points.setPoints(edgePoints);
 		lbl_points.setDoublePoints(doublePoints);
 	}
 	
+	/**
+	 * Kann je nach Uebergabeparameter den Button aktiv/inaktiv
+	 * schalten und den Text des Buttons aendern 
+	 * @param isActive - <i>true</i> - Button aktiv, 
+	 * <i>false</i> - Button inaktiv
+	 * @param text - Text, der auf dem Button dargestellt wird
+	 * (Standardtext, wenn <b>""</b>)
+	 */
 	public void updateButton(boolean isActive, String text)
 	{
 		if (text != "")
@@ -732,6 +742,12 @@ public class MainWindow
 		btn_drawTalon.setFocusPainted(isActive);
 	}
 
+	/**
+	 * Aktualisiert das Punktelabel nach dem Zug eines Spielers mit
+	 * dessen aktuellem Punktestand
+	 * @param player - Der Spieler, dessen Punkte aktualisiert werden sollen
+	 * @param playerIndex - Der Spielerindex des Spielers
+	 */
 	public void updatePlayerPoints(Player player, int playerIndex)
 	{
 		if (playerIndex == 0)
@@ -743,16 +759,19 @@ public class MainWindow
 	/**
 	 * Stellt den Pfeil neben der Punktzahl des aktuellen Spielers dar
 	 * @param playerIndex - Index des aktuellen Spielers
-	 * @param playedDominoes - 
+	 * @param playedDominoes - Die Anzahl der bereits gelegten Steine
 	 */
 	public void updatePlayerArrow(int playerIndex, int playedDominoes)
 	{
+		// Variable fuer das Icon erzeugen
 		ImageIcon arrow = null;
+		// Positionen der Labels holen
 		int x1 = lbl_player1Points.getLocation().x;
 		int y1 = lbl_player1Points.getLocation().y;
 		int x2 = lbl_player2Points.getLocation().x;
 		int y2 = lbl_player2Points.getLocation().y;
 		
+		// das Bild laden
 		try
 		{
 			arrow = new ImageIcon("ImageSrc/Arrow.png");
@@ -760,18 +779,26 @@ public class MainWindow
 			e.printStackTrace();
 		}
 		
+		// wenn Spieler 1 der aktive Spieler ist
 		if (playerIndex == 0)
 		{
+			// wenn das Label kein Icon hat
 			if (lbl_player1Points.getIcon() == null)
 			{
-				lbl_player1Points.setIcon(arrow);			// TODO warum verschiebt der die Labels
+				// Icon setzen und Position anpassen, da das
+				// Label durch das Icon nach rechts geschoben wird
+				lbl_player1Points.setIcon(arrow);
 				lbl_player1Points.setLocation(x1 - 24, y1);
+				// das Icon aus dem Label des andern Spielers entfernen
 				lbl_player2Points.setIcon(null);
 				
+				// wenn bereits Steine gelegt worden sind, muss das Label
+				// des anderen Spielers zurueck nach rechts geschoben werden
 				if (playedDominoes != 0)
 					lbl_player2Points.setLocation(x2 + 24, y2);
 			}
 		}
+		// wenn Spieler 2 der aktive Spieler ist
 		else
 		{
 			if (lbl_player2Points.getIcon() == null)
@@ -794,6 +821,8 @@ public class MainWindow
 	{
 		// Punktelabel zuruecksetzen
 		lbl_points.setText("Punkte: 0");
+		
+		btn_drawTalon.setText("Stein ziehen");
 		// Punktelabel der Spieler auf Ursprungskoordinaten zurueck schieben
 		lbl_player1Points.setBounds(contentPane.getWidth() - 93, 45, 105, 20);
 		lbl_player2Points.setBounds(contentPane.getWidth() - 93, 65, 105, 20);
@@ -870,7 +899,7 @@ public class MainWindow
 	/**
 	 * Stellt diverse Meldungen auf dem Bildschirm dar
 	 * @param text1 - Der Text, der in dem oberen Label stehen soll
-	 * @param text2 - Der Text, der in dem oberen Label stehen soll
+	 * @param text2 - Der Text, der in dem unteren Label stehen soll
 	 * @param textSize - die Textgroesse
 	 * @param delay - Die Zeit, die verstreichen soll, bevor die Meldung angezeigt wird (in Millisekunden)
 	 * @param fadeOut - Gibt an, ob die dargestellte Meldung wieder ausgeblendet werden soll

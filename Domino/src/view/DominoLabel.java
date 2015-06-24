@@ -5,6 +5,9 @@ import javax.swing.JLabel;
 
 import data.Stone;
 
+/**
+ * Ein JLabel, dass die Dominosteine des Spiels halten kann 
+ */
 public class DominoLabel extends JLabel
 {
 	private static final long serialVersionUID = 1L;

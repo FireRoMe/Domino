@@ -4,38 +4,61 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+/**
+ * Der Dominostein 
+ */
 public class Stone
 {
+	/** linke bzw. obere Augenzahl */
 	private int pips1 = 36;
+	/** rechte bzw. untere Augenzahl */
 	private int pips2 = 36;
+	/** Wert des Steins */
 	private int value;
+	/** Doppelstein ja/nein */
 	private boolean doublestone;
+	/** Spinner ja/nein */
 	private boolean spinner;
+	/** Vertikal gelegt ja/nein */
 	private boolean vertical;
+	/** Das Bild des Dominosteins */
 	private Image icon;
+	/** Das Originalbild */
 	private BufferedImage rawImage;
+	/** linker Nachbar */
 	private Stone leftNeighbour;
+	/** rechter Nachbar */
 	private Stone rightNeighbour;
+	/** oberer Nachbar */
 	private Stone topNeighbour;
+	/** unterer Nachbar */
 	private Stone bottomNeighbour;
+	/** Groesse des Bildes auf dem Stein */
 	private Dimension imageSize;
+	/** Der Spieler, der den Stein zuerst auf der Hand haelt */
 	private Player player;
-	private boolean rotated = false;
 	
+	/**
+	 * Konstruktor Dominostein
+	 * @param pips1 - Augenzahl 1
+	 * @param pips2 - Augenzahl 2
+	 * @param imageSize - Bildgroesse
+	 */
 	public Stone(int pips1, int pips2, Dimension imageSize)
 	{
 		this.pips1 = pips1;
 		this.pips2 = pips2;
 		this.imageSize = imageSize;
 		
+		// Wert des Steins berechnen
 		calculateValue();
+		// Pruefen, ob der Stein ein Doppelstein ist
 		setDoublestone();
 	}
 
@@ -60,6 +83,8 @@ public class Stone
 	
 	public void rotateImage(int angle)
 	{
+		/* Das Bild wird bei jedem Schleifendurchlauf um
+		90 Grad gedreht */
 		int z = angle / 90;
 		for (int i = 1; i<=z; i++)
 		{
@@ -68,48 +93,41 @@ public class Stone
 			double radians = Math.toRadians(degrees);
 			double sin = Math.abs(Math.sin(radians));
 			double cos = Math.abs(Math.cos(radians));
-			int newWidth = (int)Math.round(icon.getWidth(null) * cos + icon.getHeight(null) * sin);
-			int newHeight = (int)Math.round(icon.getWidth(null) * sin + icon.getHeight(null) * cos);
+			// Berechnungen zur neuen Breite und Hoehe des Steins
+			int newWidth = (int)Math.round(icon.getWidth(null) 
+											* cos + icon.getHeight(null) * sin);
+			int newHeight = (int)Math.round(icon.getWidth(null) 
+											* sin + icon.getHeight(null) * cos);
+			// Bild auf Stein mittig ausrichten
 			int x = (newWidth - icon.getWidth(null)) / 2;
 			int y = (newHeight - icon.getHeight(null)) / 2;
 			
 			System.out.println("Breite: " + newWidth + ", Hoehe: " + newHeight);
 			
-			BufferedImage rotate = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g2d = rotate.createGraphics();
+			/* neues BufferedImage erstellen, auf das das rotierte Bild
+			gezeichnet werden soll */
+			BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight,
+														BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2d = rotatedImage.createGraphics();
 			AffineTransform at = new AffineTransform();
 			
-			at.setToRotation(radians, x + (icon.getWidth(null) / 2), y + (icon.getHeight(null) / 2));
+			// Bild rotieren
+			at.setToRotation(radians, x + (icon.getWidth(null) / 2), y 
+											+ (icon.getHeight(null) / 2));
+			// Bild verschieben
 			at.translate(x, y);
+			// Drehung und Verschiebung ausfuehren
 			g2d.setTransform(at);
+			// Transformiertes Bild zeichnen
 			g2d.drawImage(rawImage, 0, 0, null);
 			g2d.dispose();
 			
-			rawImage = rotate;
+			// Originalbild speichern (zum erneuten rotieren)
+			rawImage = rotatedImage;
 			
-			icon = Toolkit.getDefaultToolkit().createImage(rotate.getSource());
+			// Das Icon fuer das DominLabel aus dem rotierten Bild erstellen 
+			icon = Toolkit.getDefaultToolkit().createImage(rotatedImage.getSource());
 		}
-	}
-	
-	public void resizeImage ()
-	{
-		int w = rawImage.getWidth();
-		int h = rawImage.getHeight();
-		int newW;
-		int newH;
-		
-		if (w>h)
-		{
-			newW = imageSize.width;
-			newH = imageSize.height;
-		}
-		else
-		{
-			newW = imageSize.height;
-			newH = imageSize.width;
-		}
-		
-		icon = rawImage.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
 	}
 	
 	public int getPips1()
@@ -159,13 +177,24 @@ public class Stone
 		return player;
 	}
 
+	/**
+	 * Ueberprueft, ob ein Stein horizontal gespiegelt werden muss
+	 * @param target - der Stein, an den angelegt werden soll
+	 * @param snapRight - ob der Stein rechts angelegt werden soll
+	 * @return <b>true</b> - wenn der Stein gedreht wurde
+	 */
 	public boolean checkRotationHorizontal(Stone target, boolean snapRight)
 	{
+		// wenn der Stein rechts angelegt werden soll
 		if (snapRight)
 		{
+			/* wenn die Augenzahlen nicht uebereinstimmen
+			muss der Stein gespiegelt werden*/
 			if (pips1 != target.getPips2())
 			{
+				// Drehung um 180 Grad
 				rotateImage(180);
+				// Augenzahlen tauschen
 				togglePips();
 				
 				return true;
@@ -173,6 +202,7 @@ public class Stone
 			else 
 				return false;
 		}
+		// wenn der Stein links angelegt werden soll
 		else
 		{
 			if (pips2 != target.getPips1())
@@ -187,6 +217,12 @@ public class Stone
 		}
 	}
 	
+	/**
+	 * Ueberprueft, ob ein Stein vertikal gespiegelt werden muss
+	 * @param target - der Stein, an den angelegt werden soll
+	 * @param snapRight - ob der Stein rechts angelegt werden soll
+	 * @return <b>true</b> - wenn der Stein gedreht wurde
+	 */
 	public boolean checkRotationVertical(Stone target, boolean snapTop)
 	{
 		setVertical(true);
@@ -217,6 +253,9 @@ public class Stone
 		}
 	}
 	
+	/**
+	 * Augenzahlen tauschen
+	 */
 	private void togglePips()
 	{
 		int temp = pips1;
@@ -232,8 +271,6 @@ public class Stone
 	public void setLeftNeighbour(final Stone s)
 	{
 		leftNeighbour = s;
-		if (s != null)
-			System.out.println("Linker Nachbar von " + pips1 + "|" + pips2 +  " ist " + s.pips1 + "|" + s.pips2);
 	}
 
 	public Stone getRightNeighbour()
@@ -244,8 +281,6 @@ public class Stone
 	public void setRightNeighbour(final Stone s)
 	{
 		this.rightNeighbour = s;
-		if (s != null)
-			System.out.println("Rechter Nachbar von " + pips1 + "|" + pips2 +  " ist " + s.pips1 + "|" + s.pips2);
 	}
 
 	public Stone getTopNeighbour()
@@ -266,19 +301,6 @@ public class Stone
 	public void setBottomNeighbour(final Stone s)
 	{
 		this.bottomNeighbour = s;
-	}
-
-	public void clearNeighbours()
-	{
-		if (leftNeighbour != null)
-			leftNeighbour.setRightNeighbour(null);
-		if (rightNeighbour != null)
-			rightNeighbour.setLeftNeighbour(null);
-		
-		leftNeighbour = null;
-		rightNeighbour = null;
-		bottomNeighbour = null;
-		topNeighbour = null;
 	}
 	
 	public void setSpinner(boolean isSpinner)
