@@ -7,8 +7,8 @@
       <Entity type="Class">
         <Name>Main</Name>
         <Access>Public</Access>
-        <Location left="1729" top="10" />
-        <Size width="269" height="227" />
+        <Location left="694" top="270" />
+        <Size width="255" height="179" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public static void Main(String[] args)</Member>
         <Modifier>None</Modifier>
@@ -16,8 +16,8 @@
       <Entity type="Class">
         <Name>MainWindow</Name>
         <Access>Public</Access>
-        <Location left="694" top="498" />
-        <Size width="631" height="989" />
+        <Location left="694" top="956" />
+        <Size width="506" height="791" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int[] paintingComponent</Member>
         <Member type="Field">private int[] renderedImages</Member>
@@ -66,8 +66,8 @@
       <Entity type="Class">
         <Name>DominoGame</Name>
         <Access>Public</Access>
-        <Location left="1344" top="10" />
-        <Size width="367" height="468" />
+        <Location left="1116" top="466" />
+        <Size width="174" height="468" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Stone[] allStones</Member>
         <Member type="Field">private ArrayList&lt;Stone&gt; talon</Member>
@@ -96,8 +96,8 @@
       <Entity type="Class">
         <Name>Player</Name>
         <Access>Public</Access>
-        <Location left="1729" top="498" />
-        <Size width="269" height="468" />
+        <Location left="1312" top="466" />
+        <Size width="189" height="468" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private ArrayList&lt;Stone&gt; hand</Member>
         <Member type="Field">private String name</Member>
@@ -127,8 +127,8 @@
       <Entity type="Class">
         <Name>Stone</Name>
         <Access>Public</Access>
-        <Location left="1344" top="498" />
-        <Size width="367" height="791" />
+        <Location left="1222" top="956" />
+        <Size width="279" height="791" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int pips1</Member>
         <Member type="Field">private int pips2</Member>
@@ -177,8 +177,8 @@
       <Entity type="Class">
         <Name>DominoLabel</Name>
         <Access>Public</Access>
-        <Location left="1729" top="256" />
-        <Size width="269" height="222" />
+        <Location left="1261" top="270" />
+        <Size width="240" height="179" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Stone stone</Member>
         <Member type="Field">private boolean draggable</Member>
@@ -191,10 +191,10 @@
       <Entity type="Class">
         <Name>DominoRules</Name>
         <Access>Public</Access>
-        <Location left="694" top="10" />
-        <Size width="631" height="468" />
+        <Location left="694" top="466" />
+        <Size width="395" height="468" />
         <Collapsed>False</Collapsed>
-        <Member type="Method">public static boolean checkCompatibility(DominoLabel dragged, DominoLabel target)</Member>
+        <Member type="Method">public boolean checkCompatibility(DominoLabel dragged, DominoLabel target)</Member>
         <Member type="Method">public static boolean snapRight(DominoLabel draggedStone, DominoLabel target)</Member>
         <Member type="Method">public static boolean checkNeighboursHorizontal(DominoLabel dragged, DominoLabel target, boolean snapRight)</Member>
         <Member type="Method">public static boolean snapTop(DominoLabel draggedStone, DominoLabel target)</Member>
@@ -216,6 +216,20 @@
         <Member type="Method">public static int calculateRoundPoints(Player[] allPlayers)</Member>
         <Member type="Method">public static int calculateHandPoints(ArrayList&lt;Stone&gt; hand)</Member>
         <Modifier>Static</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>PointsLabel</Name>
+        <Access>Public</Access>
+        <Location left="984" top="270" />
+        <Size width="245" height="179" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private int[] points</Member>
+        <Member type="Field">private boolean[] doublePoints</Member>
+        <Member type="Method">public int[] getPoints()</Member>
+        <Member type="Method">public void setPoints(int[] points)</Member>
+        <Member type="Method">public boolean[] getDoublePoints()</Member>
+        <Member type="Method">public void setDoublePoints(boolean[] doublePoints)</Member>
+        <Modifier>None</Modifier>
       </Entity>
     </Entities>
     <Relationships />
