@@ -7,7 +7,7 @@
       <Entity type="Class">
         <Name>Main</Name>
         <Access>Public</Access>
-        <Location left="694" top="270" />
+        <Location left="992" top="270" />
         <Size width="255" height="179" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public static void Main(String[] args)</Member>
@@ -16,7 +16,7 @@
       <Entity type="Class">
         <Name>MainWindow</Name>
         <Access>Public</Access>
-        <Location left="694" top="956" />
+        <Location left="173" top="195" />
         <Size width="506" height="791" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int[] paintingComponent</Member>
@@ -66,7 +66,7 @@
       <Entity type="Class">
         <Name>DominoGame</Name>
         <Access>Public</Access>
-        <Location left="1116" top="466" />
+        <Location left="1414" top="466" />
         <Size width="174" height="468" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Stone[] allStones</Member>
@@ -96,7 +96,7 @@
       <Entity type="Class">
         <Name>Player</Name>
         <Access>Public</Access>
-        <Location left="1312" top="466" />
+        <Location left="1610" top="466" />
         <Size width="189" height="468" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private ArrayList&lt;Stone&gt; hand</Member>
@@ -127,7 +127,7 @@
       <Entity type="Class">
         <Name>Stone</Name>
         <Access>Public</Access>
-        <Location left="1222" top="956" />
+        <Location left="696" top="195" />
         <Size width="279" height="791" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int pips1</Member>
@@ -177,7 +177,7 @@
       <Entity type="Class">
         <Name>DominoLabel</Name>
         <Access>Public</Access>
-        <Location left="1261" top="270" />
+        <Location left="1559" top="270" />
         <Size width="240" height="179" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Stone stone</Member>
@@ -191,7 +191,7 @@
       <Entity type="Class">
         <Name>DominoRules</Name>
         <Access>Public</Access>
-        <Location left="694" top="466" />
+        <Location left="992" top="466" />
         <Size width="395" height="468" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public boolean checkCompatibility(DominoLabel dragged, DominoLabel target)</Member>
@@ -220,7 +220,7 @@
       <Entity type="Class">
         <Name>PointsLabel</Name>
         <Access>Public</Access>
-        <Location left="984" top="270" />
+        <Location left="1282" top="270" />
         <Size width="245" height="179" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int[] points</Member>

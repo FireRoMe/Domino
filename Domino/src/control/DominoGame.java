@@ -868,7 +868,7 @@ public class DominoGame
 						view.clearHand();
 						
 						// wenn ein Spieler keine Steine mehr hat, endet die Runde
-						if (player.isNoStones())
+						if (player.isNoStones() && endGame == false)
 						{
 							endRound = true;
 						}
